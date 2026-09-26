@@ -1,0 +1,338 @@
+{
+  "@@locale": "vi",
+  "app_name": "Music App",
+  "splash_tagline": "Nghe nhạc mọi lúc",
+  "hello_blank_fragment": "Hello blank fragment",
+  "toast_added_favourite": "Đã thêm vào bài hát yêu thích",
+  "toast_removed_favourite": "Đã xoá khỏi bài hát yêu thích",
+  "lyrics_empty": "Chưa có lyrics cho bài hát",
+  "singer_info_empty": "Chưa có thông tin ca sĩ",
+  "singer_bio_empty": "Chưa có tiểu sử cho ca sĩ này",
+  "network_offline": "Không có kết nối mạng",
+  "network_offline_subtitle": "Một số tính năng có thể tạm thời không khả dụng",
+  "network_online": "Đã kết nối lại",
+  "network_online_subtitle": "Kết nối internet đã được khôi phục",
+  "network_offline_cta_downloads": "Nhạc đã tải",
+  "download_remove_action": "Xóa khỏi Đã tải",
+  "download_action": "Tải về",
+  "download_status_downloading": "Đang tải…",
+  "download_status_completed": "Đã tải",
+  "download_started": "Đã bắt đầu tải bài hát",
+  "download_already_done": "Bài hát đã được tải",
+  "downloaded_songs_title": "Đã tải",
+  "downloaded_songs_count": "{count} bài hát . Đã lưu trên máy",
+  "@downloaded_songs_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "downloaded_songs_empty": "Chưa có bài hát đã tải",
+  "toast_removed_download": "Đã xoá bài hát khỏi Đã tải",
+  "song_options": "Tùy chọn bài hát",
+  "search_section_songs": "Bài hát",
+  "search_section_artists": "Ca sĩ",
+  "search_empty_title": "Không tìm thấy kết quả",
+  "search_empty_subtitle": "Thử từ khóa khác cho bài hát hoặc ca sĩ",
+  "search_songs_empty": "Không có bài hát",
+  "search_singers_empty": "Không có ca sĩ",
+  "search_recent_title": "Tìm gần đây",
+  "search_recent_clear_all": "Xóa tất cả",
+  "search_suggestions_title": "Đề xuất cho bạn",
+  "voice_search_title": "Tìm kiếm bằng giọng nói",
+  "voice_search_listening": "Đang nghe…",
+  "voice_search_try_again": "Không nghe rõ. Thử nói lại",
+  "voice_search_unsupported": "Thiết bị không hỗ trợ nhận dạng giọng nói",
+  "voice_search_need_network": "Cần kết nối mạng để nhận dạng giọng nói",
+  "voice_search_permission_denied": "Cần quyền micro để tìm kiếm bằng giọng nói",
+  "voice_search_cancel": "Huỷ",
+  "singer_detail_songs_count": "{count} bài hát",
+  "@singer_detail_songs_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "singer_detail_songs_empty": "Chưa có bài hát của ca sĩ này",
+  "profile_signed_out_title": "Đăng nhập tài khoản",
+  "profile_signed_out_subtitle": "Lưu và đồng bộ trải nghiệm nghe nhạc",
+  "profile_sign_in_google": "Đăng nhập bằng Google",
+  "profile_sign_out": "Đăng xuất",
+  "profile_user_fallback": "Người dùng Music App",
+  "auth_config_missing": "Thiếu OAuth Web Client ID. Hãy cập nhật google-services.json sau khi thêm SHA-1 và SHA-256 trên Firebase.",
+  "auth_google_unavailable": "Không thể mở danh sách tài khoản Google",
+  "auth_invalid_credential": "Thông tin đăng nhập Google không hợp lệ",
+  "recent_history_title": "Nghe gần đây",
+  "recent_history_empty": "Chưa có bài hát đã nghe gần đây",
+  "recent_history_count": "{count} bài hát",
+  "@recent_history_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recent_history_sync_title": "Đồng bộ lịch sử nghe?",
+  "recent_history_sync_message": "Bạn có lịch sử nghe trên thiết bị. Bạn muốn đồng bộ lịch sử này với tài khoản Google vừa đăng nhập không?",
+  "recent_history_sync_action": "Đồng bộ",
+  "recent_history_discard_action": "Không đồng bộ",
+  "recent_history_sync_success": "Đã đồng bộ lịch sử nghe",
+  "recent_history_discarded": "Đã xóa lịch sử nghe local",
+  "favourite_login_title": "Đăng nhập để yêu thích",
+  "favourite_login_message": "Bạn cần đăng nhập Google để lưu bài hát yêu thích theo tài khoản.",
+  "favourite_login_action": "Đăng nhập",
+  "favourite_login_later": "Để sau",
+  "favourite_login_required": "Bạn cần đăng nhập để sử dụng bài hát yêu thích",
+  "favourite_offline": "Cần kết nối internet để thay đổi bài hát yêu thích",
+  "favourite_operation_failed": "Không thể cập nhật bài hát yêu thích",
+  "category_songs_count": "{count} bài hát",
+  "@category_songs_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "category_songs_empty": "Chưa có bài hát thuộc thể loại này",
+  "sleep_timer_menu": "Hẹn giờ",
+  "sleep_timer_title": "Hẹn giờ tắt",
+  "sleep_timer_15": "15 phút",
+  "sleep_timer_30": "30 phút",
+  "sleep_timer_45": "45 phút",
+  "sleep_timer_60": "1 giờ",
+  "sleep_timer_end_of_track": "Tới cuối bài",
+  "sleep_timer_custom": "Tuỳ chọn khác",
+  "sleep_timer_cancel_remaining": "Tắt hẹn giờ (Còn lại {remaining})",
+  "@sleep_timer_cancel_remaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "sleep_timer_remaining_text": "Còn lại {remaining}",
+  "@sleep_timer_remaining_text": {
+    "placeholders": {
+      "remaining": {
+        "type": "String"
+      }
+    }
+  },
+  "sleep_timer_custom_title": "Tuỳ chỉnh thời gian",
+  "sleep_timer_hours": "Giờ",
+  "sleep_timer_minutes": "Phút",
+  "sleep_timer_confirm": "Xác nhận",
+  "sleep_timer_cancel": "Huỷ",
+  "sleep_timer_expired": "Đã tắt nhạc",
+  "sleep_timer_custom_invalid": "Chọn ít nhất 1 phút",
+  "playlist_section_title": "Playlist",
+  "playlist_empty": "Chưa có playlist",
+  "playlist_create_title": "Tạo playlist",
+  "playlist_name_hint": "Tên playlist",
+  "playlist_public_label": "Công khai",
+  "playlist_create_confirm": "Tạo",
+  "playlist_cancel": "Huỷ",
+  "playlist_name_required": "Nhập tên playlist",
+  "playlist_created": "Đã tạo playlist",
+  "playlist_add_title": "Thêm vào playlist",
+  "playlist_create_new": "Tạo playlist mới",
+  "playlist_added": "Đã thêm vào {playlistName}",
+  "@playlist_added": {
+    "placeholders": {
+      "playlistName": {
+        "type": "String"
+      }
+    }
+  },
+  "playlist_already_added": "Bài hát đã có trong playlist",
+  "playlist_song_count": "{count} bài hát",
+  "@playlist_song_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "playlist_meta_public": "{songCount} bài hát · Công khai",
+  "@playlist_meta_public": {
+    "placeholders": {
+      "songCount": {
+        "type": "int"
+      }
+    }
+  },
+  "playlist_meta_private": "{songCount} bài hát · Riêng tư",
+  "@playlist_meta_private": {
+    "placeholders": {
+      "songCount": {
+        "type": "int"
+      }
+    }
+  },
+  "playlist_privacy_public": "Công khai",
+  "playlist_privacy_private": "Riêng tư",
+  "playlist_songs_empty": "Chưa có bài hát trong playlist",
+  "playlist_login_title": "Đăng nhập để dùng playlist",
+  "playlist_login_message": "Bạn cần đăng nhập Google để tạo playlist và thêm bài hát theo tài khoản.",
+  "playlist_login_required": "Bạn cần đăng nhập để sử dụng playlist",
+  "playlist_offline": "Cần kết nối internet để thay đổi playlist",
+  "playlist_operation_failed": "Không thể cập nhật playlist",
+  "playlist_menu_add": "Thêm bài hát",
+  "playlist_menu_edit": "Chỉnh sửa playlist",
+  "playlist_menu_delete": "Xoá playlist",
+  "playlist_add_songs_title": "Thêm bài hát vào playlist",
+  "playlist_edit_title": "Chỉnh sửa playlist",
+  "playlist_save": "Lưu",
+  "playlist_updated": "Đã lưu playlist",
+  "playlist_deleted": "Đã xoá playlist",
+  "playlist_delete_title": "Xoá playlist?",
+  "playlist_delete_message": "Playlist và các bài hát trong đó sẽ bị xoá khỏi tài khoản.",
+  "playlist_delete_confirm": "Xoá",
+  "playlist_search_empty": "Không có bài hát",
+  "playlist_search_hint": "Tìm kiếm bài hát, nghệ sĩ...",
+  "playlist_remove_song": "Xoá nhạc khỏi playlist này",
+  "playlist_song_removed": "Đã xoá khỏi playlist",
+  "artist_follow": "Quan tâm",
+  "artist_following": "Đã quan tâm",
+  "artist_play": "Phát nhạc",
+  "artist_info_title": "Thông tin",
+  "artist_see_more": "xem thêm",
+  "artist_see_less": "thu gọn",
+  "artist_login_title": "Đăng nhập để quan tâm",
+  "artist_login_message": "Bạn cần đăng nhập Google để lưu nghệ sĩ quan tâm theo tài khoản.",
+  "artist_followed_toast": "Đã quan tâm",
+  "artist_unfollowed_toast": "Đã bỏ quan tâm",
+  "artist_offline": "Cần kết nối internet để thay đổi nghệ sĩ quan tâm",
+  "artist_operation_failed": "Không thể cập nhật nghệ sĩ quan tâm",
+  "artist_empty": "Chưa quan tâm nghệ sĩ nào",
+  "artist_play_empty": "Ca sĩ này chưa có bài hát",
+  "artist_screen_title": "Nghệ sĩ",
+  "artist_add": "Thêm nghệ sĩ",
+  "artist_add_search_hint": "Tìm kiếm nghệ sĩ",
+  "artist_add_empty": "Không có nghệ sĩ",
+  "artist_add_complete": "Hoàn thành",
+  "artist_add_select_required": "Chọn 1 nghệ sĩ mà bạn quan tâm yêu thích trở lên",
+  "nav_library": "Thư viện",
+  "nav_discover": "Khám phá",
+  "nav_zingchart": "#zingchart",
+  "nav_radio": "Radio",
+  "nav_profile": "Cá nhân",
+  "home_topics_title": "Chủ đề & thể loại",
+  "home_new_releases": "Mới phát hành",
+  "tab_all": "Tất cả",
+  "tab_vietnam": "Việt Nam",
+  "tab_international": "Quốc Tế",
+  "home_update_label": "Cập nhật",
+  "see_all": "Xem tất cả",
+  "favourite_songs_title": "Bài hát yêu thích",
+  "play_shuffle": "PHÁT NGẪU NHIÊN",
+  "filter_label": "Lọc",
+  "filter_guide_message": "Lọc bài hát theo nghệ sĩ, thể loại…\nđể bạn dễ dàng lựa chọn",
+  "filter_guide_understood": "Đã hiểu",
+  "favourite_empty_title": "Bạn chưa có bài hát ưa thích nào",
+  "favourite_empty_subtitle": "Hãy lưu về bài hát bạn yêu thích để\ncó thể nghe lại bất cứ lúc nào",
+  "favourite_songs_count": "{count} bài hát . Đã lưu vào thư viện",
+  "@favourite_songs_count": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "arrange_title": "Sắp xếp theo",
+  "arrange_newest": "Mới nhất",
+  "arrange_oldest": "Cũ nhất",
+  "arrange_by_song_name": "Tên bài hát (A-Z)",
+  "arrange_by_artist_name": "Tên nghệ sĩ (A-Z)",
+  "player_time_placeholder": "0:00",
+  "player_play_from": "PHÁT TỪ",
+  "mini_player_singer_format": "Ca sĩ: {singer}",
+  "@mini_player_singer_format": {
+    "placeholders": {
+      "singer": {
+        "type": "String"
+      }
+    }
+  },
+  "song_options_add_library": "Thêm vào thư viện",
+  "song_options_added_library": "Đã thêm vào thư viện",
+  "song_options_play_similar": "Phát nội dung tương tự",
+  "song_options_add_playlist": "Thêm vào danh sách phát",
+  "song_options_play_next": "Phát kế tiếp",
+  "song_options_ringtone": "Cài nhạc chờ & nhạc chuông",
+  "song_options_view_album": "Xem album",
+  "song_options_view_artist": "Xem nghệ sĩ",
+  "song_options_block": "Chặn",
+  "delete_song_from_library_title": "Mua Thang Sau",
+  "delete_song_from_library_message": "Xoá bài hát khỏi thư viện?",
+  "action_delete": "Xoá",
+  "profile_upgrade_account": "Nâng cấp tài khoản",
+  "profile_premium_experience": "Trải nghiệm nghe nhạc nâng cao",
+  "profile_lossless": "Âm thanh vượt trội\n(Lossless)",
+  "profile_crossfade": "Chuyển bài mượt mà\n(Crossfade)",
+  "profile_services_section": "Dịch vụ",
+  "profile_save_data": "Tiết kiệm 3G/4G truy cập",
+  "profile_enter_code": "Nhập code",
+  "profile_personal_section": "Cá nhân",
+  "profile_following_list": "Danh sách quan tâm",
+  "profile_block_list": "Danh sách chặn",
+  "profile_hidden_list": "Danh sách tạm ẩn",
+  "radio_schedule": "Lịch Phát Sóng",
+  "radio_mood_activity": "Tâm trạng & hoạt động",
+  "radio_live_badge": "LIVE",
+  "radio_label": "RADIO",
+  "zingchart_suggested": "Gợi ý",
+  "text_bullet": "•",
+  "release_today": "Hôm nay",
+  "library_item_favourite": "Bài hát yêu thích",
+  "library_item_artists": "Nghệ sĩ",
+  "library_item_upload": "Upload",
+  "library_item_mv": "MV",
+  "error_google_sign_in": "Không thể đăng nhập bằng Google",
+  "error_profile_sync_after_login": "Đăng nhập thành công nhưng chưa thể đồng bộ hồ sơ lên Firestore",
+  "error_history_sync": "Không thể đồng bộ lịch sử. Dữ liệu local vẫn được giữ lại.",
+  "error_history_discard": "Không thể xóa lịch sử nghe local",
+  "error_profile_ensure": "Chưa thể đồng bộ hồ sơ người dùng lên Firestore",
+  "subscription_plus_name": "Plus",
+  "subscription_plus_price": "19,000đ",
+  "subscription_premium_name": "Premium",
+  "subscription_premium_price": "49,000đ",
+  "subscription_premium_tagline": "Toàn bộ đăc quyền Plus cùng kho nhạc Premium",
+  "subscription_premium_feature_all": "Nghe và tải tất cả",
+  "action_cancel": "Huỷ",
+  "notification_channel_playback": "Phát nhạc",
+  "notification_channel_download": "Tải bài hát",
+  "notification_action_previous": "Trước",
+  "notification_action_pause": "Tạm dừng",
+  "notification_action_play": "Phát",
+  "notification_action_next": "Tiếp",
+  "press_back_again_to_exit": "Nhấn thêm lần nữa để thoát",
+  "debug_start_music": "start Music",
+  "preview_song_title": "Phố đèn đỏ",
+  "preview_singer_name": "Đan Trường",
+  "preview_singer_line": "Ca sĩ: Đan Trường",
+  "preview_chart_date": "09.08.2024 - 00:00",
+  "preview_home_chart_date": "09.03.2024 - 22:21",
+  "preview_song_title_long": "Hà Nội Chiều Tháng Ba",
+  "preview_artist_name": "Hà Trần",
+  "preview_radio_title": "Acoustic Radio",
+  "preview_radio_subtitle": "Phòng nhạc Acoustic",
+  "preview_mood_song": "Nhạc Buồn",
+  "preview_topic_title": "BXH Nhac Moi",
+  "preview_ad_title": "Hay nhất của V-Pop",
+  "preview_ad_badge_top": "TOP BXH",
+  "preview_ad_badge_trending": "trending",
+  "preview_ad_description": "Thiên Lý Ơi đưa Jack -J97 trở lại với Top Trending",
+  "preview_plus_brand": "Zing MP3",
+  "preview_plus_label": "PLUS",
+  "preview_plus_price": "19,000đ",
+  "preview_plus_tagline": "Nghe nhạc với chất lượng cao nhất, không \nquảng cáo",
+  "preview_plus_no_ads": "Loại bỏ quảng cáo",
+  "preview_plus_storage": "Lưu trữ nhạc không giới hạn",
+  "preview_plus_playback": "Tuỳ chỉnh chế độ phát nhạc",
+  "preview_song_list_item": "1  Sau Lời Từ Khước(Theme Song…",
+  "preview_listen_count": "65",
+  "preview_rank": "1"
+}
