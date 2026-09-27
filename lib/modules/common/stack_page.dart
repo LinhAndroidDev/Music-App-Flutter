@@ -1,0 +1,91 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../core/l10n/l10n.dart';
+import '../../core/navigation/app_route.dart';
+
+/// Temporary scaffold for secondary routes until real UI is implemented.
+class StackPage extends StatelessWidget {
+  const StackPage({
+    super.key,
+    required this.title,
+    this.subtitle,
+  });
+
+  final String title;
+  final String? subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: Get.back,
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              Get.currentRoute,
+              style: Theme.of(context).textTheme.labelLarge,
+            ),
+            if (subtitle != null && subtitle!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(subtitle!),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+String _param(String key) => Get.parameters[key] ?? '';
+
+Widget categorySongsPage(BuildContext context) {
+  final l10n = context.l10n;
+  final title = _param(AppRouteParam.title);
+  final mode = _param(AppRouteParam.mode);
+  final categoryId = _param(AppRouteParam.categoryId);
+  return StackPage(
+    title: title.isNotEmpty ? title : l10n.home_topics_title,
+    subtitle: 'mode=$mode\ncategoryId=$categoryId',
+  );
+}
+
+Widget searchSongPage(BuildContext context) {
+  final query = _param(AppRouteParam.committedQuery);
+  return StackPage(
+    title: context.l10n.search_section_songs,
+    subtitle: query.isNotEmpty ? 'query=$query' : null,
+  );
+}
+
+Widget singerDetailPage(BuildContext context) {
+  return StackPage(
+    title: context.l10n.artist_info_title,
+    subtitle: 'singerId=${_param(AppRouteParam.singerId)}',
+  );
+}
+
+Widget playlistDetailPage(BuildContext context) {
+  final l10n = context.l10n;
+  final title = _param(AppRouteParam.playlistTitle);
+  return StackPage(
+    title: title.isNotEmpty ? title : l10n.playlist_section_title,
+    subtitle:
+        'id=${_param(AppRouteParam.playlistId)}\ncover=${_param(AppRouteParam.playlistCoverUrl)}',
+  );
+}
+
+Widget playlistIdPage(BuildContext context, String screenTitle) {
+  return StackPage(
+    title: screenTitle,
+    subtitle: 'playlistId=${_param(AppRouteParam.playlistId)}',
+  );
+}

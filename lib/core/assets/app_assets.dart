@@ -9,6 +9,7 @@ abstract final class AppAssets {
   static const icZingChart = '$icons/ic_zing_chart.svg';
   static const icRadio = '$icons/ic_radio.svg';
   static const icProfile = '$icons/ic_profile.svg';
+  static const icMusic = '$icons/ic_music.svg';
 
   // Playback
   static const icPlayMusic = '$icons/ic_play_music.svg';
