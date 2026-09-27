@@ -5,6 +5,7 @@ import '../../core/l10n/l10n.dart';
 import '../../core/navigation/app_route.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/custom_bottom_bar.dart';
+import '../discover/discover_page.dart';
 import '../library/library_page.dart';
 import '../profile/profile_page.dart';
 import 'main_controller.dart';
@@ -21,7 +22,7 @@ class MainPage extends GetView<MainController> {
           index: controller.currentTab.value,
           children: const [
             LibraryPage(),
-            _TabPlaceholder(tab: AppTab.discover),
+            DiscoverPage(),
             _TabPlaceholder(tab: AppTab.zingChart),
             _TabPlaceholder(tab: AppTab.radio),
             ProfilePage(),
