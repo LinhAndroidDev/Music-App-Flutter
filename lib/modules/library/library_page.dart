@@ -15,6 +15,7 @@ import '../../data/services/recent_history_repository.dart';
 import 'library_controller.dart';
 import 'widgets/library_shortcut_card.dart';
 import 'widgets/playlist_list_tile.dart';
+import 'widgets/recent_see_all_tile.dart';
 import 'widgets/recent_song_tile.dart';
 
 class LibraryPage extends GetView<LibraryController> {
@@ -91,14 +92,8 @@ class LibraryPage extends GetView<LibraryController> {
                     itemCount: preview.length + (recent.showSeeAll ? 1 : 0),
                     itemBuilder: (_, i) {
                       if (recent.showSeeAll && i == preview.length) {
-                        return GestureDetector(
+                        return RecentSeeAllTile(
                           onTap: controller.openRecentHistory,
-                          child: const SizedBox(
-                            width: 80,
-                            child: Center(
-                              child: Icon(Icons.chevron_right, size: 32),
-                            ),
-                          ),
                         );
                       }
                       return RecentSongTile(song: preview[i]);

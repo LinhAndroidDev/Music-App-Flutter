@@ -13,20 +13,21 @@ class SubscriptionPlanCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
       padding: const EdgeInsets.fromLTRB(15, 20, 15, 15),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: plan.cardBorderColor, width: 1),
-        color: AppColors.white,
+        color: plan.cardBackground,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: plan.cardBorder, width: 0.8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Zing MP3',
+                plan.brandLabel,
                 style: TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
@@ -58,6 +59,7 @@ class SubscriptionPlanCard extends StatelessWidget {
             plan.price,
             style: const TextStyle(
               fontSize: 18,
+              height: 1.2,
               fontWeight: FontWeight.bold,
               color: AppColors.textBlack,
             ),
@@ -65,23 +67,66 @@ class SubscriptionPlanCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             plan.note,
-            style: const TextStyle(color: AppColors.txtHint),
+            style: const TextStyle(
+              color: AppColors.txtHint,
+              height: 1.25,
+            ),
           ),
           const SizedBox(height: 20),
-          ...plan.features.map(
-            (f) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                children: [
-                  AppIcon(f.iconAsset, size: 22, color: plan.accentColor),
-                  const SizedBox(width: 10),
-                  Expanded(child: Text(f.label)),
-                ],
-              ),
-            ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (var i = 0; i < plan.features.length; i++) ...[
+                if (i > 0) const SizedBox(width: 10),
+                Expanded(child: _FeatureColumn(
+                  feature: plan.features[i],
+                  accentColor: plan.accentColor,
+                )),
+              ],
+            ],
           ),
         ],
       ),
+    );
+  }
+}
+
+class _FeatureColumn extends StatelessWidget {
+  const _FeatureColumn({
+    required this.feature,
+    required this.accentColor,
+  });
+
+  final SubscriptionFeature feature;
+  final Color accentColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: AppIcon(feature.iconAsset, size: 25, color: accentColor),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Text(
+          feature.label,
+          textAlign: TextAlign.center,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 12,
+            height: 1.2,
+            color: AppColors.grey1,
+          ),
+        ),
+      ],
     );
   }
 }

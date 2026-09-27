@@ -2,22 +2,24 @@ import 'package:flutter/material.dart';
 
 class SubscriptionPlan {
   const SubscriptionPlan({
+    required this.brandLabel,
     required this.badgeLabel,
-    required this.tierName,
     required this.price,
     required this.note,
     required this.features,
     required this.accentColor,
-    required this.cardBorderColor,
+    required this.cardBackground,
+    required this.cardBorder,
   });
 
+  final String brandLabel;
   final String badgeLabel;
-  final String tierName;
   final String price;
   final String note;
   final List<SubscriptionFeature> features;
   final Color accentColor;
-  final Color cardBorderColor;
+  final Color cardBackground;
+  final Color cardBorder;
 }
 
 class SubscriptionFeature {

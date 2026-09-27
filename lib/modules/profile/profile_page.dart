@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -57,22 +59,39 @@ class ProfilePage extends GetView<ProfileController> {
                       l10n.profile_upgrade_account,
                       style: _sectionTitle,
                     ),
-                    AppIcon(
-                      AppAssets.icBack,
-                      size: 35,
-                      color: AppColors.black,
+                    Transform.rotate(
+                      angle: -math.pi / 2,
+                      child: const AppIcon(
+                        AppAssets.icBack,
+                        size: 35,
+                        color: AppColors.black,
+                      ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
-              SizedBox(
-                height: 280,
-                child: PageView.builder(
-                  controller: PageController(viewportFraction: 0.88),
-                  itemCount: plans.length,
-                  itemBuilder: (_, i) => SubscriptionPlanCard(plan: plans[i]),
-                ),
+              LayoutBuilder(
+                builder: (context, _) {
+                  final cardWidth = MediaQuery.sizeOf(context).width * 0.8;
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.only(left: 15),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        for (var i = 0; i < plans.length; i++) ...[
+                          if (i > 0) const SizedBox(width: 15),
+                          SizedBox(
+                            width: cardWidth,
+                            child: SubscriptionPlanCard(plan: plans[i]),
+                          ),
+                        ],
+                        const SizedBox(width: 15),
+                      ],
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 20),
               Padding(
@@ -107,7 +126,7 @@ class ProfilePage extends GetView<ProfileController> {
               ),
               _profileRow(AppAssets.icInternet, l10n.profile_save_data),
               _profileRow(AppAssets.icEnterCode, l10n.profile_enter_code),
-              const SizedBox(height: 20),
+              const SizedBox(height: 40),
               Padding(
                 padding: const EdgeInsets.only(left: 15),
                 child: Text(l10n.nav_profile, style: _sectionTitle),
@@ -135,12 +154,13 @@ class ProfilePage extends GetView<ProfileController> {
   List<SubscriptionPlan> _buildPlans(dynamic l10n) {
     return [
       SubscriptionPlan(
-        badgeLabel: l10n.preview_plus_label,
-        tierName: l10n.subscription_plus_name,
+        brandLabel: l10n.preview_plus_brand,
+        badgeLabel: l10n.subscription_plus_name,
         price: l10n.subscription_plus_price,
         note: l10n.preview_plus_tagline,
         accentColor: AppColors.purple1,
-        cardBorderColor: AppColors.purple1.withOpacity(0.4),
+        cardBackground: AppColors.subscriptionPlusFill,
+        cardBorder: AppColors.subscriptionPlusStroke,
         features: [
           SubscriptionFeature(
             iconAsset: AppAssets.icAdvertisement,
@@ -157,12 +177,13 @@ class ProfilePage extends GetView<ProfileController> {
         ],
       ),
       SubscriptionPlan(
+        brandLabel: l10n.preview_plus_brand,
         badgeLabel: l10n.subscription_premium_name,
-        tierName: l10n.subscription_premium_name,
         price: l10n.subscription_premium_price,
         note: l10n.subscription_premium_tagline,
         accentColor: AppColors.bgOrange,
-        cardBorderColor: AppColors.bgOrange.withOpacity(0.5),
+        cardBackground: AppColors.subscriptionPremiumFill,
+        cardBorder: AppColors.subscriptionPremiumStroke,
         features: [
           SubscriptionFeature(
             iconAsset: AppAssets.icDiamond,
@@ -214,6 +235,7 @@ class ProfilePage extends GetView<ProfileController> {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(15, 20, 15, 0),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             AppIcon(icon, size: 25, color: AppColors.black),
             const SizedBox(width: 15),

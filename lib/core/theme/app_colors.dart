@@ -29,6 +29,11 @@ abstract final class AppColors {
   static const Color bgGreen2 = Color(0xFF68B16A);
   static const Color green3 = Color(0xFF52B8C8);
   static const Color purple1 = Color(0xFF673AB7);
+  static const Color subscriptionPlusFill = Color(0xFFEDE2FF);
+  static const Color subscriptionPlusStroke = Color(0xFFD3BCFB);
+  static const Color subscriptionPremiumFill = Color(0xFFFFF4E4);
+  static const Color subscriptionPremiumStroke = Color(0xFFFFDEAE);
+  static const Color notificationDot = Color(0xFFF44336);
   static const Color yellowDark = Color(0xFFFFC107);
   static const Color lyricLineActive = Color(0xFFFFEB3B);
   static const Color lyricHighlightScrim = Color(0x6AE5E5E5);

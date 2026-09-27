@@ -40,17 +40,9 @@ class ScreenHeader extends StatelessWidget {
             ),
           ),
           if (showProfileActions) ...[
-            AppIcon(AppAssets.icSetting, size: 25, color: AppColors.black),
+            _profileActionWithDot(AppAssets.icSetting),
             const SizedBox(width: 20),
-            AppIcon(AppAssets.icCircle, size: 6, color: AppColors.black),
-            const SizedBox(width: 20),
-            AppIcon(
-              AppAssets.icNotificationThin,
-              size: 25,
-              color: AppColors.black,
-            ),
-            const SizedBox(width: 20),
-            AppIcon(AppAssets.icCircle, size: 6, color: AppColors.black),
+            _profileActionWithDot(AppAssets.icNotificationThin),
             const SizedBox(width: 20),
           ],
           if (showMicrophone) ...[
@@ -68,6 +60,18 @@ class ScreenHeader extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  /// Matches `layout_header.xml` `viewProfile`: icon + red dot adjacent, 20dp before search.
+  static Widget _profileActionWithDot(String iconAsset) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        AppIcon(iconAsset, size: 25, color: AppColors.black),
+        const AppIcon(AppAssets.icCircle, size: 6),
+      ],
     );
   }
 }

@@ -24,6 +24,7 @@ abstract final class AppAssets {
   static const iconRandom = '$icons/icon_random.svg';
 
   // Common actions
+  static const icSeeMore = '$icons/ic_see_more.svg';
   static const icBack = '$icons/ic_back.svg';
   static const icBackThin = '$icons/ic_back_thin.svg';
   static const icSearch = '$icons/ic_search.svg';
