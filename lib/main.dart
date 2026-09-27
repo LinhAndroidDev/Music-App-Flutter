@@ -1,12 +1,18 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'app/app_pages.dart';
+import 'app/initial_binding.dart';
 import 'core/l10n/l10n.dart';
 import 'core/theme/app_theme.dart';
+import 'firebase_options.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MusicApp());
 }
 
@@ -22,6 +28,7 @@ class MusicApp extends StatelessWidget {
       fallbackLocale: AppLocales.vi,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocales.all,
+      initialBinding: InitialBinding(),
       initialRoute: AppPages.initial,
       getPages: AppPages.pages,
       defaultTransition: Transition.cupertino,
