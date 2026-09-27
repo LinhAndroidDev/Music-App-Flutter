@@ -1,6 +1,12 @@
 export 'models/auth_user.dart';
 export 'models/firestore_song.dart';
+export 'models/song.dart';
+export 'models/user_playlist.dart';
 export 'services/auth_repository.dart';
+export 'services/favourite_song_repository.dart';
 export 'services/firestore_crud_service.dart';
 export 'services/firestore_music_repository.dart';
+export 'services/followed_singer_repository.dart';
+export 'services/playlist_repository.dart';
+export 'services/recent_history_repository.dart';
 export 'services/user_repository.dart';

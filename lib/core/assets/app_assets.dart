@@ -40,6 +40,25 @@ abstract final class AppAssets {
   static const icWifiOff = '$icons/ic_wifi_off.svg';
   static const icWifiConnected = '$icons/ic_wifi_connected.svg';
 
+  static const favourite = '$icons/favourite.svg';
+  static const icArtist = '$icons/ic_artist.svg';
+  static const icUpload = '$icons/ic_upload.svg';
+  static const icMv = '$icons/ic_mv.svg';
+  static const icAddPlaylist = '$icons/ic_add_playlist.svg';
+  static const icNotificationThin = '$icons/ic_notification_thin.svg';
+  static const icCircle = '$icons/ic_circle.svg';
+  static const icSound = '$icons/ic_sound.svg';
+  static const icChange = '$icons/ic_change.svg';
+  static const icInternet = '$icons/ic_internet.svg';
+  static const icEnterCode = '$icons/ic_enter_code.svg';
+  static const icPersonChecked = '$icons/ic_person_checked.svg';
+  static const icBlock = '$icons/ic_block.svg';
+  static const icTemporary = '$icons/ic_temporary.svg';
+  static const icDiamond = '$icons/ic_diamond.svg';
+  static const icAdvertisement = '$icons/ic_advertisement.svg';
+  static const icCustom = '$icons/ic_custom.svg';
+  static const icPlaylist = '$icons/ic_playlist.svg';
+
   static const imgShare = '$images/img_share.png';
   static const icLauncherForeground = '$images/ic_launcher_foreground.webp';
 }

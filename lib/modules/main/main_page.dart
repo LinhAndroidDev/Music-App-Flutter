@@ -5,30 +5,12 @@ import '../../core/l10n/l10n.dart';
 import '../../core/navigation/app_route.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/custom_bottom_bar.dart';
+import '../library/library_page.dart';
+import '../profile/profile_page.dart';
 import 'main_controller.dart';
 
 class MainPage extends GetView<MainController> {
   const MainPage({super.key});
-
-  static const _tabs = [
-    AppTab.library,
-    AppTab.discover,
-    AppTab.zingChart,
-    AppTab.radio,
-    AppTab.profile,
-  ];
-
-  String _tabLabel(BuildContext context, int tab) {
-    final l10n = context.l10n;
-    return switch (tab) {
-      AppTab.library => l10n.nav_library,
-      AppTab.discover => l10n.nav_discover,
-      AppTab.zingChart => l10n.nav_zingchart,
-      AppTab.radio => l10n.nav_radio,
-      AppTab.profile => l10n.nav_profile,
-      _ => '',
-    };
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,11 +19,13 @@ class MainPage extends GetView<MainController> {
         backgroundColor: AppColors.background,
         body: IndexedStack(
           index: controller.currentTab.value,
-          children: _tabs
-              .map(
-                (tab) => _TabPlaceholder(label: _tabLabel(context, tab)),
-              )
-              .toList(),
+          children: const [
+            LibraryPage(),
+            _TabPlaceholder(tab: AppTab.discover),
+            _TabPlaceholder(tab: AppTab.zingChart),
+            _TabPlaceholder(tab: AppTab.radio),
+            ProfilePage(),
+          ],
         ),
         bottomNavigationBar: CustomBottomBar(
           currentTab: controller.currentTab.value,
@@ -54,12 +38,19 @@ class MainPage extends GetView<MainController> {
 }
 
 class _TabPlaceholder extends StatelessWidget {
-  const _TabPlaceholder({required this.label});
+  const _TabPlaceholder({required this.tab});
 
-  final String label;
+  final int tab;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final label = switch (tab) {
+      AppTab.discover => l10n.nav_discover,
+      AppTab.zingChart => l10n.nav_zingchart,
+      AppTab.radio => l10n.nav_radio,
+      _ => '',
+    };
     return SafeArea(
       child: Center(
         child: Text(
