@@ -8,6 +8,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_icon.dart';
 import '../../core/widgets/screen_header.dart';
 import '../../data/models/user_playlist.dart';
+import '../../data/playback/downloaded_song_repository.dart';
 import '../../data/services/favourite_song_repository.dart';
 import '../../data/services/followed_singer_repository.dart';
 import '../../data/services/playlist_repository.dart';
@@ -26,6 +27,7 @@ class LibraryPage extends GetView<LibraryController> {
     final l10n = context.l10n;
     final favourites = Get.find<FavouriteSongRepository>();
     final followed = Get.find<FollowedSingerRepository>();
+    final downloads = Get.find<DownloadedSongRepository>();
     final recent = Get.find<RecentHistoryRepository>();
     final playlists = Get.find<PlaylistRepository>();
 
@@ -44,13 +46,13 @@ class LibraryPage extends GetView<LibraryController> {
               ),
               const SizedBox(height: 20),
               Obx(() {
+                downloads.completedCount.value;
                 final items = _shortcuts(context, favourites, followed);
-                return SizedBox(
-                  height: 130,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: items.length,
-                    itemBuilder: (_, i) => items[i],
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: items,
                   ),
                 );
               }),

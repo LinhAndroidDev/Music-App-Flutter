@@ -3,7 +3,15 @@ import 'package:get/get.dart';
 
 import '../core/l10n/l10n.dart';
 import '../core/navigation/app_route.dart';
+import '../modules/artist/add_artist_binding.dart';
+import '../modules/artist/add_artist_page.dart';
+import '../modules/artist/followed_singers_binding.dart';
+import '../modules/artist/followed_singers_page.dart';
 import '../modules/common/stack_page.dart';
+import '../modules/downloaded/downloaded_songs_binding.dart';
+import '../modules/downloaded/downloaded_songs_page.dart';
+import '../modules/favourite/favourite_song_binding.dart';
+import '../modules/favourite/favourite_song_page.dart';
 import '../modules/main/main_binding.dart';
 import '../modules/main/main_page.dart';
 import '../modules/splash/splash_binding.dart';
@@ -31,15 +39,13 @@ class AppPages {
     ),
     GetPage(
       name: AppRoute.favouriteSong,
-      page: () => Builder(
-        builder: (context) => StackPage(title: context.l10n.favourite_songs_title),
-      ),
+      page: () => const FavouriteSongPage(),
+      binding: FavouriteSongBinding(),
     ),
     GetPage(
       name: AppRoute.downloadedSongs,
-      page: () => Builder(
-        builder: (context) => StackPage(title: context.l10n.downloaded_songs_title),
-      ),
+      page: () => const DownloadedSongsPage(),
+      binding: DownloadedSongsBinding(),
     ),
     GetPage(
       name: AppRoute.searchSong,
@@ -74,15 +80,13 @@ class AppPages {
     ),
     GetPage(
       name: AppRoute.followedSingers,
-      page: () => Builder(
-        builder: (context) => StackPage(title: context.l10n.artist_screen_title),
-      ),
+      page: () => const FollowedSingersPage(),
+      binding: FollowedSingersBinding(),
     ),
     GetPage(
       name: AppRoute.addArtist,
-      page: () => Builder(
-        builder: (context) => StackPage(title: context.l10n.artist_add),
-      ),
+      page: () => const AddArtistPage(),
+      binding: AddArtistBinding(),
     ),
   ];
 }

@@ -34,26 +34,34 @@ class LibraryShortcutCard extends StatelessWidget {
           decoration: AppDecorations.libraryShortcutCard(),
           padding: const EdgeInsets.fromLTRB(10, 13, 10, 13),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               AppIcon(iconAsset, size: 30, color: iconColor),
               const SizedBox(height: 15),
               Text(
                 title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
                 style: const TextStyle(
                   fontSize: 14,
+                  height: 1.15,
                   fontWeight: FontWeight.bold,
                   color: AppColors.black,
                 ),
               ),
               const SizedBox(height: 5),
-              Opacity(
-                opacity: count == 0 ? 0 : 1,
-                child: Text(
-                  count == 0 ? '' : '$count',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.txtHint,
+              SizedBox(
+                height: 14,
+                child: Opacity(
+                  opacity: count == 0 ? 0 : 1,
+                  child: Text(
+                    count == 0 ? '0' : '$count',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      height: 1.1,
+                      color: AppColors.txtHint,
+                    ),
                   ),
                 ),
               ),

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../core/base/base_controller.dart';
 import '../../core/l10n/l10n.dart';
 import '../../core/navigation/app_navigate.dart';
+import '../../data/playback/downloaded_song_repository.dart';
 import '../../data/services/favourite_song_repository.dart';
 import '../../data/services/followed_singer_repository.dart';
 import '../../data/services/playlist_repository.dart' show PlaylistMutationResult, PlaylistRepository;
@@ -11,10 +12,11 @@ import 'widgets/create_playlist_dialog.dart';
 class LibraryController extends BaseController {
   FavouriteSongRepository get _favourites => Get.find<FavouriteSongRepository>();
   FollowedSingerRepository get _followed => Get.find<FollowedSingerRepository>();
+  DownloadedSongRepository get _downloads => Get.find<DownloadedSongRepository>();
   PlaylistRepository get _playlists => Get.find<PlaylistRepository>();
   int get favouriteCount => _favourites.favouriteCount.value;
   int get followedCount => _followed.followedCount.value;
-  int get downloadedCount => 0;
+  int get downloadedCount => _downloads.completedCount.value;
 
   void onShortcutTap(int index) {
     switch (index) {
