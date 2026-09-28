@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_icon.dart';
 import '../../discover/utils/format_duration.dart';
 import '../player_controller.dart';
+import 'player_seek_bar.dart';
 
 class PlayerTransportControls extends StatefulWidget {
   const PlayerTransportControls({super.key});
@@ -48,33 +49,31 @@ class _PlayerTransportControlsState extends State<PlayerTransportControls> {
           ? (_seekFractionWhileDragging! * durationMs).round()
           : state.positionMs;
 
+      const timeStyle = TextStyle(color: AppColors.white, fontSize: 12);
+      final canSeek = durationMs > 0;
+
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.only(bottom: 20),
         child: Column(
           children: [
-            SliderTheme(
-              data: SliderTheme.of(context).copyWith(
-                trackHeight: 3,
-                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-                overlayShape: SliderComponentShape.noOverlay,
-                activeTrackColor: AppColors.bgPurple,
-                inactiveTrackColor: AppColors.white.withOpacity(0.25),
-                thumbColor: AppColors.white,
-              ),
-              child: Slider(
-                value: seekFraction.clamp(0.0, 1.0),
-                onChangeStart: durationMs > 0
-                    ? (_) {
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+              child: PlayerSeekBar(
+                value: seekFraction,
+                enabled: canSeek,
+                onDragStart: canSeek
+                    ? () {
                         setState(() => _isUserSeeking = true);
                       }
                     : null,
-                onChanged: durationMs > 0
+                onChanged: canSeek
                     ? (v) {
                         setState(() => _seekFractionWhileDragging = v);
                       }
                     : null,
-                onChangeEnd: durationMs > 0
-                    ? (v) async {
+                onDragEnd: canSeek
+                    ? () async {
+                        final v = _seekFractionWhileDragging ?? seekFraction;
                         setState(() {
                           _isUserSeeking = false;
                           _seekFractionWhileDragging = null;
@@ -85,25 +84,20 @@ class _PlayerTransportControlsState extends State<PlayerTransportControls> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    formatDurationMs(displayPositionMs),
-                    style: const TextStyle(color: AppColors.txtGreyBlur, fontSize: 12),
-                  ),
-                  Text(
-                    formatDurationMs(durationMs),
-                    style: const TextStyle(color: AppColors.txtGreyBlur, fontSize: 12),
-                  ),
+                  Text(formatDurationMs(displayPositionMs), style: timeStyle),
+                  Text(formatDurationMs(durationMs), style: timeStyle),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
                 IconButton(
                   onPressed: () => _player.toggleShuffle(),
                   icon: AppIcon(AppAssets.iconRandom, size: 28, color: shuffleTint),
@@ -134,7 +128,8 @@ class _PlayerTransportControlsState extends State<PlayerTransportControls> {
                     ),
                   ),
                 ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

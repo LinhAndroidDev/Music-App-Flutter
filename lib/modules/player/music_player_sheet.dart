@@ -182,15 +182,16 @@ class _MusicPlayerSheetState extends State<MusicPlayerSheet> {
                       child: PageView(
                         controller: _pageController,
                         onPageChanged: (i) => setState(() => _pageIndex = i),
-                        children: const [
-                          PlayerSingerPage(),
-                          PlayerSongPage(),
-                          PlayerLyricsPage(),
+                        children: [
+                          const PlayerSingerPage(),
+                          const PlayerSongPage(),
+                          PlayerLyricsPage(
+                            isPageVisible: _pageIndex == MusicPlayerSheet.pageLyrics,
+                          ),
                         ],
                       ),
                     ),
                     const PlayerTransportControls(),
-                    const SizedBox(height: 16),
                   ],
                 ),
               ),
