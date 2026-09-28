@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import '../../core/navigation/app_navigate.dart';
 import '../../core/navigation/app_navigation_route.dart';
 import '../../core/playback/playback_controller.dart';
+import '../../core/theme/app_colors.dart';
 import '../../core/widgets/custom_bottom_bar.dart';
 import '../main/main_controller.dart';
 import 'music_player_coordinator.dart';
@@ -17,8 +18,8 @@ class AppPlayerShell extends StatefulWidget {
 
   final Widget? child;
 
-  /// Mini bar: progress (2) + padding + 50dp artwork row (~68).
-  static const miniPlayerBarHeight = 68.0;
+  /// Matches [MiniPlayerBar.totalHeight] (card + margins).
+  static double get miniPlayerBarHeight => MiniPlayerBar.totalHeight;
 
   static double mainBottomNavHeight(BuildContext context) {
     return MediaQuery.paddingOf(context).bottom + 49;
@@ -96,22 +97,31 @@ class _AppPlayerShellState extends State<AppPlayerShell> {
         playbackState.hasActivePlayer &&
         playbackState.currentSong != null;
 
-    final bottomInset = AppPlayerShell.bottomContentInset(
+    final chromeBottom = AppPlayerShell.bottomContentInset(
       context,
       showBottomBar: showBottomBar,
       showMiniBar: showMiniBar,
     );
 
-    // Keep [widget.child] (Navigator) out of Obx — avoids markNeedsBuild during build.
+    final mediaQuery = MediaQuery.of(context);
+    final childMediaQuery = mediaQuery.copyWith(
+      padding: mediaQuery.padding.copyWith(
+        bottom: mediaQuery.padding.bottom + chromeBottom,
+      ),
+    );
+
+    // Keep [widget.child] (GetX Navigator) full-screen; inset via MediaQuery so Hero/Overlay stay valid.
     return Stack(
       fit: StackFit.expand,
       children: [
-        Positioned(
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: bottomInset,
-          child: widget.child ?? const SizedBox.shrink(),
+        Positioned.fill(
+          child: MediaQuery(
+            data: childMediaQuery,
+            child: ColoredBox(
+              color: AppColors.background,
+              child: widget.child ?? const SizedBox.shrink(),
+            ),
+          ),
         ),
         if (fullPlayerOpen)
           const Positioned.fill(child: MusicPlayerSheet()),

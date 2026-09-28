@@ -39,7 +39,8 @@ class MusicApp extends StatelessWidget {
         }
       },
       builder: (context, child) => AppPlayerShell(child: child),
-      defaultTransition: Transition.cupertino,
+      // Cupertino transition + AppPlayerShell previously broke HeroController on push.
+      defaultTransition: Transition.rightToLeft,
       debugShowCheckedModeBanner: false,
     );
   }

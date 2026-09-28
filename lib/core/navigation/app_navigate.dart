@@ -1,3 +1,4 @@
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
 import '../../core/playback/playback_controller.dart';
@@ -94,11 +95,18 @@ abstract final class AppNavigate {
     String? songId,
     bool preservePlayback = false,
   }) {
-    presentPlayerUi();
-    return _openPlayerFuture ??= _openPlayerImpl(
+    // Avoid nested navigation / Obx rebuild while Navigator is locked (e.g. mini player tap mid-transition).
+    if (_openPlayerFuture != null) {
+      return _openPlayerFuture!;
+    }
+    final completer = _openPlayerFuture = _openPlayerImpl(
       songId: songId,
       preservePlayback: preservePlayback,
     ).whenComplete(() => _openPlayerFuture = null);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      presentPlayerUi();
+    });
+    return completer;
   }
 
   static Future<void> _openPlayerImpl({
