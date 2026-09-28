@@ -5,6 +5,8 @@ import '../../core/base/base_controller.dart';
 import '../../core/l10n/l10n.dart';
 import '../../core/navigation/app_navigate.dart';
 import '../../data/models/song.dart';
+import '../../core/playback/playback_controller.dart';
+import '../../data/playback/song_playback_repository.dart';
 import '../../data/services/home_catalog_service.dart';
 import 'models/home_advertisement.dart';
 import 'models/home_national.dart';
@@ -13,10 +15,17 @@ import 'utils/song_national_extension.dart';
 import 'utils/song_pages.dart';
 
 class DiscoverController extends BaseController {
-  DiscoverController({HomeCatalogService? catalog})
-      : _catalog = catalog ?? Get.find<HomeCatalogService>();
+  DiscoverController({
+    HomeCatalogService? catalog,
+    PlaybackController? playback,
+    SongPlaybackRepository? songQueue,
+  })  : _catalog = catalog ?? Get.find<HomeCatalogService>(),
+        _playback = playback ?? Get.find<PlaybackController>(),
+        _songQueue = songQueue ?? Get.find<SongPlaybackRepository>();
 
   final HomeCatalogService _catalog;
+  final PlaybackController _playback;
+  final SongPlaybackRepository _songQueue;
 
   final isLoading = true.obs;
   final isRefreshing = false.obs;
@@ -33,6 +42,9 @@ class DiscoverController extends BaseController {
   }
 
   List<Song> get chartPreview => topSongs.take(5).toList();
+
+  List<Song> get _filteredLatestSongs =>
+      latestSongs.where((s) => s.matchesNational(selectedNational.value)).toList();
 
   @override
   void onInit() {
@@ -59,6 +71,7 @@ class DiscoverController extends BaseController {
       ]);
       latestSongs.assignAll(_catalog.latestSongs);
       topSongs.assignAll(_catalog.topSongs);
+      _songQueue.syncCachesFromCatalog();
     } finally {
       isLoading.value = false;
     }
@@ -81,6 +94,7 @@ class DiscoverController extends BaseController {
       advertisements.assignAll(ads);
       latestSongs.assignAll(_catalog.latestSongs);
       topSongs.assignAll(_catalog.topSongs);
+      _songQueue.syncCachesFromCatalog();
       if (newChart != null && top100 != null) {
         await _loadTopics(newChart, top100);
       }
@@ -136,7 +150,38 @@ class DiscoverController extends BaseController {
 
   void openZingChartTab() => AppNavigate.toZingChartTab();
 
-  void stubPlayback() {
-    Get.snackbar('', 'Tính năng sắp có', snackPosition: SnackPosition.BOTTOM);
+  Future<void> playLatestSong(Song song) async {
+    final list = _filteredLatestSongs;
+    if (list.isEmpty) return;
+    await _playSafely(() => _playback.playFromVisibleList(list, song.id));
+  }
+
+  Future<void> playChartSong(Song song) async {
+    if (topSongs.isEmpty) return;
+    await _playSafely(
+      () => _playback.playFromVisibleList(topSongs.toList(), song.id),
+    );
+  }
+
+  Future<void> _playSafely(Future<bool> Function() play) async {
+    try {
+      final ok = await play();
+      if (!ok) {
+        _showPlaybackError('Không thể phát bài hát này');
+      }
+    } on StateError catch (e) {
+      _showPlaybackError(e.message);
+    } catch (_) {
+      _showPlaybackError('Không thể phát bài hát này');
+    }
+  }
+
+  void _showPlaybackError(String message) {
+    Get.snackbar(
+      '',
+      message,
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 4),
+    );
   }
 }

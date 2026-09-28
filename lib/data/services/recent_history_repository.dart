@@ -73,6 +73,34 @@ class RecentHistoryRepository extends GetxService {
 
   bool get showSeeAll => recentSongs.length > 5;
 
+  Future<void> recordSong(Song song) async {
+    if (song.id.isEmpty) return;
+    final user = _authRepository.currentUser.value;
+    if (user == null) return;
+    final uid = user.uid;
+    try {
+      await _recentCollection(uid).doc(song.id).set(
+        {
+          'songId': song.id,
+          'title': song.title,
+          'nameSinger': song.nameSinger,
+          'thumbnailUrl': song.thumbnailUrl,
+          'audioUrl': song.audioUrl,
+          'lyricUrl': song.lyricUrl,
+          'durationSec': song.durationSec,
+          'categoryId': song.categoryId,
+          'categoryName': song.categoryName,
+          'views': song.views,
+          'lastPlayedAt': FieldValue.serverTimestamp(),
+          'playCount': FieldValue.increment(1),
+        },
+        SetOptions(merge: true),
+      );
+    } catch (_) {
+      // Non-blocking playback side effect.
+    }
+  }
+
   CollectionReference<Map<String, dynamic>> _recentCollection(String uid) {
     return _firestore
         .collection(FirebaseConstants.usersCollection)

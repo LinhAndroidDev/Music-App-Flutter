@@ -47,7 +47,7 @@ class DiscoverPage extends GetView<DiscoverController> {
                     child: ScreenHeader(
                       title: l10n.nav_discover,
                       onSearch: () => AppNavigate.toSearchSong(),
-                      onMicrophone: controller.stubPlayback,
+                      onMicrophone: () {},
                     ),
                   ),
                 ),
@@ -114,7 +114,7 @@ class DiscoverPage extends GetView<DiscoverController> {
                         '${controller.selectedNational.value}_${controller.releasePages.length}',
                       ),
                       pages: controller.releasePages,
-                      onSongTap: controller.stubPlayback,
+                      onSongTap: controller.playLatestSong,
                     ),
                   ),
                 ),
@@ -124,8 +124,8 @@ class DiscoverPage extends GetView<DiscoverController> {
                       songs: controller.chartPreview,
                       chartDateLabel: l10n.preview_home_chart_date,
                       onSeeAll: controller.openZingChartTab,
-                      onSongTap: (_) => controller.stubPlayback(),
-                      onSongMore: (_) => controller.stubPlayback(),
+                      onSongTap: controller.playChartSong,
+                      onSongMore: controller.playChartSong,
                     ),
                   ),
                 ),
@@ -147,7 +147,7 @@ class _NewReleasePager extends StatefulWidget {
   });
 
   final List<List<Song>> pages;
-  final VoidCallback onSongTap;
+  final void Function(Song song) onSongTap;
 
   @override
   State<_NewReleasePager> createState() => _NewReleasePagerState();
@@ -189,8 +189,8 @@ class _NewReleasePagerState extends State<_NewReleasePager> {
                   .map(
                     (s) => HomeReleaseSongRow(
                       song: s,
-                      onTap: widget.onSongTap,
-                      onMore: widget.onSongTap,
+                      onTap: () => widget.onSongTap(s),
+                      onMore: () => widget.onSongTap(s),
                     ),
                   )
                   .toList(),
