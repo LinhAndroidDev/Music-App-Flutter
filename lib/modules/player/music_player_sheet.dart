@@ -116,53 +116,73 @@ class _MusicPlayerSheetState extends State<MusicPlayerSheet> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                            padding: const EdgeInsets.fromLTRB(15, 20, 15, 0),
                             child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                IconButton(
-                                  onPressed: _closePlayer,
-                                  icon: const AppIcon(AppAssets.icBack, color: AppColors.white),
+                                SizedBox(
+                                  width: 35,
+                                  height: 35,
+                                  child: IconButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: _closePlayer,
+                                    icon: const AppIcon(
+                                      AppAssets.icBack,
+                                      size: 35,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
                                 ),
                                 Expanded(
                                   child: Column(
                                     children: [
                                       Text(
                                         l10n.player_play_from,
-                                        style: TextStyle(
-                                          color: AppColors.white.withOpacity(0.6),
-                                          fontSize: 11,
-                                          letterSpacing: 1,
+                                        style: const TextStyle(
+                                          color: AppColors.white,
+                                          fontSize: 12,
                                         ),
                                       ),
                                       Text(
                                         l10n.nav_zingchart,
                                         style: const TextStyle(
-                                          color: AppColors.white,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.textWhite,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                IconButton(
-                                  onPressed: () {
-                                    final song = Get.find<PlaybackController>()
-                                        .playbackState
-                                        .value
-                                        .currentSong;
-                                    if (song == null) return;
-                                    SongOptionsSheet.show(
-                                      routeContext,
-                                      song: song,
-                                      config: SongOptionsConfig.player,
-                                    );
-                                  },
-                                  icon: const AppIcon(AppAssets.icMenu, color: AppColors.white),
+                                SizedBox(
+                                  width: 35,
+                                  height: 35,
+                                  child: IconButton(
+                                    padding: EdgeInsets.zero,
+                                    alignment: Alignment.centerRight,
+                                    onPressed: () {
+                                      final song = Get.find<PlaybackController>()
+                                          .playbackState
+                                          .value
+                                          .currentSong;
+                                      if (song == null) return;
+                                      SongOptionsSheet.show(
+                                        routeContext,
+                                        song: song,
+                                        config: SongOptionsConfig.player,
+                                      );
+                                    },
+                                    icon: const AppIcon(
+                                      AppAssets.icMenu,
+                                      size: 25,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
+                          const SizedBox(height: 12),
                         ],
                       ),
                     ),
@@ -177,7 +197,6 @@ class _MusicPlayerSheetState extends State<MusicPlayerSheet> {
                         );
                       },
                     ),
-                    const SizedBox(height: 8),
                     Expanded(
                       child: PageView(
                         controller: _pageController,

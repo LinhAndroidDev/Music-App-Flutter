@@ -20,16 +20,17 @@ class PlayerPagerIndicator extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(pageCount, (i) {
         final active = i == currentPage;
+        // ServiceMusic FragmentMusic: 12×2dp / 18×2.5dp, alpha 0.45 / 1, 3dp gap.
         return GestureDetector(
           onTap: onTap == null ? null : () => onTap!(i),
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            margin: const EdgeInsets.symmetric(horizontal: 3),
+            margin: EdgeInsets.only(left: i == 0 ? 0 : 3),
             width: active ? 18 : 12,
-            height: 4,
+            height: active ? 2.5 : 2,
             decoration: BoxDecoration(
               color: AppColors.white.withOpacity(active ? 1 : 0.45),
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(active ? 2 : 1),
             ),
           ),
         );
