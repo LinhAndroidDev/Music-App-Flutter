@@ -4,9 +4,12 @@ import '../../core/base/base_controller.dart';
 import '../../core/l10n/l10n.dart';
 import '../../core/navigation/app_navigate.dart';
 import '../../data/playback/downloaded_song_repository.dart';
+import '../../data/models/song.dart';
 import '../../data/services/favourite_song_repository.dart';
 import '../../data/services/followed_singer_repository.dart';
 import '../../data/services/playlist_repository.dart' show PlaylistMutationResult, PlaylistRepository;
+import '../../data/services/recent_history_repository.dart';
+import '../library/utils/library_playback.dart';
 import 'widgets/create_playlist_dialog.dart';
 
 class LibraryController extends BaseController {
@@ -33,6 +36,13 @@ class LibraryController extends BaseController {
   }
 
   void openRecentHistory() => AppNavigate.toRecentHistory();
+
+  Future<void> playRecentSong(Song song) async {
+    final recent = Get.find<RecentHistoryRepository>();
+    final list = recent.recentSongs.toList();
+    if (list.isEmpty) return;
+    await playVisibleSongList(list, song.id);
+  }
 
   Future<void> showCreatePlaylistDialog() async {
     final l10n = Get.context?.l10n;

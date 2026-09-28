@@ -7,6 +7,8 @@ import '../modules/artist/add_artist_binding.dart';
 import '../modules/artist/add_artist_page.dart';
 import '../modules/artist/followed_singers_binding.dart';
 import '../modules/artist/followed_singers_page.dart';
+import '../modules/artist/singer_detail/singer_detail_binding.dart';
+import '../modules/artist/singer_detail/singer_detail_page.dart';
 import '../modules/common/stack_page.dart';
 import '../modules/downloaded/downloaded_songs_binding.dart';
 import '../modules/downloaded/downloaded_songs_page.dart';
@@ -53,7 +55,8 @@ class AppPages {
     ),
     GetPage(
       name: AppRoute.singerDetail,
-      page: () => Builder(builder: singerDetailPage),
+      page: () => const SingerDetailPage(),
+      binding: SingerDetailBinding(),
     ),
     GetPage(
       name: AppRoute.playlistDetail,

@@ -4,8 +4,8 @@ import 'package:get/get.dart';
 import '../../core/base/base_controller.dart';
 import '../../core/l10n/l10n.dart';
 import '../../core/navigation/app_navigate.dart';
+import '../library/utils/library_playback.dart';
 import '../../data/models/song.dart';
-import '../../core/playback/playback_controller.dart';
 import '../../data/playback/song_playback_repository.dart';
 import '../../data/services/home_catalog_service.dart';
 import 'models/home_advertisement.dart';
@@ -17,14 +17,11 @@ import 'utils/song_pages.dart';
 class DiscoverController extends BaseController {
   DiscoverController({
     HomeCatalogService? catalog,
-    PlaybackController? playback,
     SongPlaybackRepository? songQueue,
   })  : _catalog = catalog ?? Get.find<HomeCatalogService>(),
-        _playback = playback ?? Get.find<PlaybackController>(),
         _songQueue = songQueue ?? Get.find<SongPlaybackRepository>();
 
   final HomeCatalogService _catalog;
-  final PlaybackController _playback;
   final SongPlaybackRepository _songQueue;
 
   final isLoading = true.obs;
@@ -153,39 +150,11 @@ class DiscoverController extends BaseController {
   Future<void> playLatestSong(Song song) async {
     final list = _filteredLatestSongs;
     if (list.isEmpty) return;
-    await _playSafely(() => _playback.playFromVisibleList(list, song.id));
+    await playVisibleSongList(list, song.id);
   }
 
   Future<void> playChartSong(Song song) async {
     if (topSongs.isEmpty) return;
-    await _playSafely(
-      () => _playback.playFromVisibleList(topSongs.toList(), song.id),
-    );
-  }
-
-  Future<void> _playSafely(Future<bool> Function() play) async {
-    try {
-      AppNavigate.presentPlayerUi();
-      final ok = await play();
-      if (!ok) {
-        AppNavigate.closePlayer();
-        _showPlaybackError('Không thể phát bài hát này');
-        return;
-      }
-    } on StateError catch (e) {
-      AppNavigate.closePlayer();
-      _showPlaybackError(e.message);
-    } catch (_) {
-      _showPlaybackError('Không thể phát bài hát này');
-    }
-  }
-
-  void _showPlaybackError(String message) {
-    Get.snackbar(
-      '',
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 4),
-    );
+    await playVisibleSongList(topSongs.toList(), song.id);
   }
 }

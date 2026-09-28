@@ -7,6 +7,8 @@ import 'app/initial_binding.dart';
 import 'core/l10n/l10n.dart';
 import 'core/theme/app_theme.dart';
 import 'firebase_options.dart';
+import 'core/navigation/app_navigation_route.dart';
+import 'modules/player/app_player_shell.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +33,12 @@ class MusicApp extends StatelessWidget {
       initialBinding: InitialBinding(),
       initialRoute: AppPages.initial,
       getPages: AppPages.pages,
+      routingCallback: (routing) {
+        if (Get.isRegistered<AppNavigationRoute>()) {
+          Get.find<AppNavigationRoute>().updateRoute(routing?.current);
+        }
+      },
+      builder: (context, child) => AppPlayerShell(child: child),
       defaultTransition: Transition.cupertino,
       debugShowCheckedModeBanner: false,
     );

@@ -5,6 +5,10 @@ import '../../core/l10n/l10n.dart';
 import '../../core/navigation/app_route.dart';
 
 /// Temporary scaffold for secondary routes until real UI is implemented.
+///
+/// Song list screens must call [playVisibleSongList] from
+/// `lib/modules/library/utils/library_playback.dart` (or `song_list_playback.dart`)
+/// when implementing row tap → full player + mini player.
 class StackPage extends StatelessWidget {
   const StackPage({
     super.key,

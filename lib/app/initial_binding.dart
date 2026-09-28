@@ -17,6 +17,7 @@ import '../data/playback/playback_preferences.dart';
 import '../data/playback/playable_uri_resolver.dart';
 import '../data/lyrics/song_lyrics_loader.dart';
 import '../data/playback/song_playback_repository.dart';
+import '../core/navigation/app_navigation_route.dart';
 import '../modules/player/music_player_coordinator.dart';
 import '../modules/player/player_controller.dart';
 
@@ -45,5 +46,6 @@ class InitialBinding extends Bindings {
     Get.put<SongLyricsLoader>(SongLyricsLoader(), permanent: true);
     Get.put<PlayerController>(PlayerController(), permanent: true);
     Get.put<MusicPlayerCoordinator>(MusicPlayerCoordinator(), permanent: true);
+    Get.put<AppNavigationRoute>(AppNavigationRoute(), permanent: true);
   }
 }

@@ -98,7 +98,10 @@ class LibraryPage extends GetView<LibraryController> {
                           onTap: controller.openRecentHistory,
                         );
                       }
-                      return RecentSongTile(song: preview[i]);
+                      return RecentSongTile(
+                        song: preview[i],
+                        onTap: () => controller.playRecentSong(preview[i]),
+                      );
                     },
                   ),
                 );
