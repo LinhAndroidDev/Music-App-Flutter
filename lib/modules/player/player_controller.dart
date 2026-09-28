@@ -42,6 +42,9 @@ class PlayerController extends GetxController {
   final FirestoreMusicRepository _music;
   final SongLyricsLoader _lyricsLoader;
 
+  /// Updates only when track changes — use for player art/metadata (not [PlaybackController.playbackState] position ticks).
+  final currentSong = Rxn<Song>();
+
   final isFavourite = false.obs;
   final repeatMode = RepeatMode.notRepeat.obs;
   final singerState = const PlayerSingerUiState().obs;
@@ -58,7 +61,11 @@ class PlayerController extends GetxController {
     super.onInit();
     ever(_playback.playbackState, (app_playback.PlaybackState state) {
       final song = state.currentSong;
-      if (song != null && song.id != _boundSongId) {
+      if (song == null) {
+        currentSong.value = null;
+        return;
+      }
+      if (song.id != _boundSongId) {
         _onSongChanged(song);
       }
     });
@@ -81,6 +88,7 @@ class PlayerController extends GetxController {
 
   void _onSongChanged(Song song) {
     _boundSongId = song.id;
+    currentSong.value = song;
     _favSub?.cancel();
     _favSub = _favourites.watchIsFavourite(song.id).listen((v) {
       isFavourite.value = v;

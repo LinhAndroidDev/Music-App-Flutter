@@ -79,7 +79,6 @@ class PlaybackController extends GetxController {
     _stateSub?.cancel();
     _stateSub = h.uiStateStream.listen((s) {
       playbackState.value = s;
-      playbackState.refresh();
     });
   }
 

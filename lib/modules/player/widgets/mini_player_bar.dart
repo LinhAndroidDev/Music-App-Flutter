@@ -7,6 +7,7 @@ import '../../../core/navigation/app_navigate.dart';
 import '../../../core/playback/playback_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_icon.dart';
+import '../music_player_coordinator.dart';
 import '../player_controller.dart';
 
 class MiniPlayerBar extends StatelessWidget {
@@ -17,10 +18,16 @@ class MiniPlayerBar extends StatelessWidget {
     final playback = Get.find<PlaybackController>();
     final player = Get.find<PlayerController>();
 
+    final playerUi = Get.find<MusicPlayerCoordinator>();
+
     return Obx(() {
       final state = playback.playbackState.value;
       final isFavourite = player.isFavourite.value;
+      final fullPlayerOpen = playerUi.isOpen.value;
       if (!state.hasActivePlayer || state.currentSong == null) {
+        return const SizedBox.shrink();
+      }
+      if (fullPlayerOpen) {
         return const SizedBox.shrink();
       }
 

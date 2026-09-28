@@ -16,6 +16,7 @@ class PlayerLyricsPage extends StatefulWidget {
 
 class _PlayerLyricsPageState extends State<PlayerLyricsPage> {
   static const _scrollAnimMaxMs = 700;
+  static const _lyricsSyncThrottleMs = 220;
 
   final _scrollController = ScrollController();
   final _playback = Get.find<PlaybackController>();
@@ -23,6 +24,7 @@ class _PlayerLyricsPageState extends State<PlayerLyricsPage> {
 
   int _activeIndex = 0;
   int _lastSeekSequence = 0;
+  int _lastLyricsSyncAtMs = 0;
   Worker? _playbackWorker;
 
   @override
@@ -46,8 +48,15 @@ class _PlayerLyricsPageState extends State<PlayerLyricsPage> {
     final state = _playback.playbackState.value;
     if (state.seekSequence != _lastSeekSequence) {
       _lastSeekSequence = state.seekSequence;
+      _lastLyricsSyncAtMs = 0;
       _updateActive(lines, state.positionMs, jump: true);
       return;
+    }
+
+    if (state.isPlaying) {
+      final now = DateTime.now().millisecondsSinceEpoch;
+      if (now - _lastLyricsSyncAtMs < _lyricsSyncThrottleMs) return;
+      _lastLyricsSyncAtMs = now;
     }
 
     _updateActive(lines, state.positionMs, jump: false);

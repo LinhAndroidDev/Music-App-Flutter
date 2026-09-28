@@ -45,18 +45,17 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
   int _prepareGeneration = 0;
   String? _historyRecordedForSongId;
   Timer? _sleepTimerTimer;
+
+  /// Mirrors ServiceMusic [SEEK_UI_THROTTLE_MS] — fewer UI rebuilds while playing.
+  static const _seekUiThrottleMs = 220;
+
+  int _lastUiPublishAtMs = 0;
+  int _lastUiPublishedPositionMs = -1;
+
   void _init() {
     unawaited(_configureAudioSession());
     _player.playerStateStream.listen(_onPlayerState);
-    _player.positionStream.listen((pos) {
-      _emitUi(
-        _uiState.copyWith(
-          positionMs: pos.inMilliseconds,
-          durationMs: _resolvedDurationMs(),
-        ),
-      );
-      _broadcastPlaybackState();
-    });
+    _player.positionStream.listen(_onPositionTick);
     _player.durationStream.listen((d) {
       if (d != null) {
         _emitUi(_uiState.copyWith(durationMs: d.inMilliseconds));
@@ -82,8 +81,47 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
     return _uiState.durationMs;
   }
 
-  void _emitUi(app.PlaybackState state) {
+  void _onPositionTick(Duration pos) {
+    final positionMs = pos.inMilliseconds;
+    final next = _uiState.copyWith(
+      positionMs: positionMs,
+      durationMs: _resolvedDurationMs(),
+    );
+    _uiState = next;
+    if (_shouldPublishPositionUi(positionMs)) {
+      _markPositionUiPublished(positionMs);
+      _emitUi(next);
+    }
+  }
+
+  bool _shouldPublishPositionUi(int positionMs) {
+    if (!_player.playing) {
+      return positionMs != _lastUiPublishedPositionMs;
+    }
+    final now = DateTime.now().millisecondsSinceEpoch;
+    if (_lastUiPublishedPositionMs < 0) return true;
+    if (now - _lastUiPublishAtMs >= _seekUiThrottleMs) return true;
+    if ((positionMs - _lastUiPublishedPositionMs).abs() >= _seekUiThrottleMs) {
+      return true;
+    }
+    return false;
+  }
+
+  void _markPositionUiPublished(int positionMs) {
+    _lastUiPublishedPositionMs = positionMs;
+    _lastUiPublishAtMs = DateTime.now().millisecondsSinceEpoch;
+  }
+
+  void _resetPositionUiThrottle() {
+    _lastUiPublishedPositionMs = -1;
+    _lastUiPublishAtMs = 0;
+  }
+
+  void _emitUi(app.PlaybackState state, {bool forcePublish = false}) {
     _uiState = state;
+    if (forcePublish) {
+      _markPositionUiPublished(state.positionMs);
+    }
     if (!_uiStateController.isClosed) {
       _uiStateController.add(state);
     }
@@ -150,6 +188,7 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
       }
       _historyRecordedForSongId = null;
       await _publishMedia(song);
+      _resetPositionUiThrottle();
       _emitUi(
         _uiState.copyWith(
           currentSong: song,
@@ -159,6 +198,7 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
           positionMs: startPositionMs,
           durationMs: song.durationSec > 0 ? song.durationSec * 1000 : _uiState.durationMs,
         ),
+        forcePublish: true,
       );
       if (autoStart) {
         await _player.play();
@@ -229,7 +269,15 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
   }
 
   void _onPlayerState(PlayerState state) {
-    _emitUi(_uiState.copyWith(isPlaying: state.playing));
+    _resetPositionUiThrottle();
+    _emitUi(
+      _uiState.copyWith(
+        isPlaying: state.playing,
+        positionMs: _player.position.inMilliseconds,
+        durationMs: _resolvedDurationMs(),
+      ),
+      forcePublish: true,
+    );
     _broadcastPlaybackState();
   }
 
@@ -320,12 +368,15 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
   @override
   Future<void> seek(Duration position) async {
     await _player.seek(position);
+    _resetPositionUiThrottle();
     _emitUi(
       _uiState.copyWith(
         positionMs: position.inMilliseconds,
         seekSequence: _uiState.seekSequence + 1,
       ),
+      forcePublish: true,
     );
+    _broadcastPlaybackState();
   }
 
   Future<void> seekToMs(int positionMs) => seek(Duration(milliseconds: positionMs));

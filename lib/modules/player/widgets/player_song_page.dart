@@ -1,15 +1,14 @@
 import 'dart:math' as math;
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../core/assets/app_assets.dart';
-import '../../../core/playback/playback_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_icon.dart';
 import '../player_controller.dart';
+import 'rotating_player_cover.dart';
 
 class PlayerSongPage extends StatelessWidget {
   const PlayerSongPage({super.key});
@@ -19,36 +18,30 @@ class PlayerSongPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final playback = Get.find<PlaybackController>();
-    final player = Get.find<PlayerController>();
     final thumbSize = math.min(MediaQuery.sizeOf(context).width - 40, _thumbSize);
+    final cachePx = (thumbSize * MediaQuery.devicePixelRatioOf(context)).round();
 
-    return Obx(() {
-      final song = playback.playbackState.value.currentSong;
-      final isFavourite = player.isFavourite.value;
-      if (song == null) {
-        return const Center(child: SizedBox.shrink());
-      }
+    final player = Get.find<PlayerController>();
 
-      return Column(
-        children: [
-          const SizedBox(height: 30),
-          SizedBox(
-            width: thumbSize,
-            height: thumbSize,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: song.thumbnailUrl.isNotEmpty
-                  ? CachedNetworkImage(
-                      imageUrl: song.thumbnailUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (_, __) => Container(color: AppColors.purpleDark1),
-                      errorWidget: (_, __, ___) => Container(color: AppColors.purpleDark1),
-                    )
-                  : Container(color: AppColors.purpleDark1),
-            ),
-          ),
-          Padding(
+    return Column(
+      children: [
+        const SizedBox(height: 30),
+        Obx(() {
+          final song = player.currentSong.value;
+          if (song == null) return const SizedBox.shrink();
+          return RotatingPlayerCover(
+            key: ValueKey(song.id),
+            songId: song.id,
+            thumbnailUrl: song.thumbnailUrl,
+            size: thumbSize,
+            cacheSizePx: cachePx,
+          );
+        }),
+        Obx(() {
+          final song = player.currentSong.value;
+          if (song == null) return const SizedBox.shrink();
+          final isFavourite = player.isFavourite.value;
+          return Padding(
             padding: const EdgeInsets.fromLTRB(20, 40, 20, 0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,10 +99,10 @@ class PlayerSongPage extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-          const Spacer(),
-        ],
-      );
-    });
+          );
+        }),
+        const Spacer(),
+      ],
+    );
   }
 }
