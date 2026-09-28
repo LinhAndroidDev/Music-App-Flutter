@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../core/assets/app_assets.dart';
+import '../../core/playback/playback_controller.dart';
 import '../../core/l10n/l10n.dart';
 import '../../core/navigation/app_navigate.dart';
 import '../../core/theme/app_colors.dart';
@@ -11,6 +13,7 @@ import 'widgets/player_sheet_background.dart';
 import 'widgets/player_singer_page.dart';
 import 'widgets/player_song_page.dart';
 import 'widgets/player_transport_controls.dart';
+import 'song_options_config.dart';
 import 'widgets/song_options_sheet.dart';
 
 class MusicPlayerSheet extends StatefulWidget {
@@ -66,8 +69,21 @@ class _MusicPlayerSheetState extends State<MusicPlayerSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final height = MediaQuery.sizeOf(context).height;
+    // Player lives in GetMaterialApp.builder (sibling of app Navigator) — nested
+    // Navigator so modal sheets/dialogs from the player menu work and stack on top.
+    return Navigator(
+      onGenerateRoute: (settings) {
+        return MaterialPageRoute<void>(
+          settings: settings,
+          builder: (routeContext) => _buildPlayer(routeContext),
+        );
+      },
+    );
+  }
+
+  Widget _buildPlayer(BuildContext routeContext) {
+    final l10n = routeContext.l10n;
+    final height = MediaQuery.sizeOf(routeContext).height;
     final maxDrag = height;
 
     return Transform.translate(
@@ -130,7 +146,18 @@ class _MusicPlayerSheetState extends State<MusicPlayerSheet> {
                                   ),
                                 ),
                                 IconButton(
-                                  onPressed: () => SongOptionsSheet.show(context),
+                                  onPressed: () {
+                                    final song = Get.find<PlaybackController>()
+                                        .playbackState
+                                        .value
+                                        .currentSong;
+                                    if (song == null) return;
+                                    SongOptionsSheet.show(
+                                      routeContext,
+                                      song: song,
+                                      config: SongOptionsConfig.player,
+                                    );
+                                  },
                                   icon: const AppIcon(AppAssets.icMenu, color: AppColors.white),
                                 ),
                               ],

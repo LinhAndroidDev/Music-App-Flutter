@@ -51,15 +51,27 @@ abstract final class AppNavigate {
 
   static void toProfileTab() => toMain(tab: AppTab.profile);
 
-  /// Switches tab when [AppRoute.main] is already visible.
+  /// Updates the main tab and returns to [AppRoute.main] when a stack screen is open.
   static void switchMainTab(int tab) {
-    if (Get.currentRoute != AppRoute.main) {
-      toMain(tab: tab);
+    if (!Get.isRegistered<MainController>()) return;
+    Get.find<MainController>().selectTab(tab);
+    if (_isMainTopRoute) return;
+    if (Get.key.currentState?.canPop() ?? false) {
+      Get.until((route) => route.settings.name == AppRoute.main);
       return;
     }
-    if (Get.isRegistered<MainController>()) {
-      Get.find<MainController>().selectTab(tab);
-    }
+    toMain(tab: tab);
+  }
+
+  /// Top GetX route is main (not a stack screen pushed on top).
+  static bool get _isMainTopRoute {
+    final route = Get.currentRoute;
+    if (_routeIsMain(route)) return true;
+    return _routeIsMain(Get.routing.current);
+  }
+
+  static bool _routeIsMain(String route) {
+    return route == AppRoute.main || route.startsWith('${AppRoute.main}?');
   }
 
   // --- Player ---

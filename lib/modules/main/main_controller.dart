@@ -1,3 +1,4 @@
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
 import '../../core/base/base_controller.dart';
@@ -18,13 +19,7 @@ class MainController extends BaseController implements MainTabController {
   @override
   void onInit() {
     super.onInit();
-    final tabParam = Get.parameters[AppRouteParam.tab];
-    if (tabParam != null) {
-      final parsed = int.tryParse(tabParam);
-      if (parsed != null && parsed >= AppTab.library && parsed <= AppTab.profile) {
-        currentTab.value = parsed;
-      }
-    }
+    syncTabFromRouteParameters();
 
     if (Get.isRegistered<AuthRepository>()) {
       final auth = Get.find<AuthRepository>();
@@ -34,7 +29,9 @@ class MainController extends BaseController implements MainTabController {
       });
     }
 
-    _closePlayerIfNothingPlaying();
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      _closePlayerIfNothingPlaying();
+    });
   }
 
   void _closePlayerIfNothingPlaying() {
@@ -42,6 +39,15 @@ class MainController extends BaseController implements MainTabController {
     final state = Get.find<PlaybackController>().playbackState.value;
     if (!state.hasActivePlayer || state.currentSong == null) {
       AppNavigate.closePlayer();
+    }
+  }
+
+  void syncTabFromRouteParameters() {
+    final tabParam = Get.parameters[AppRouteParam.tab];
+    if (tabParam == null) return;
+    final parsed = int.tryParse(tabParam);
+    if (parsed != null && parsed >= AppTab.library && parsed <= AppTab.profile) {
+      currentTab.value = parsed;
     }
   }
 

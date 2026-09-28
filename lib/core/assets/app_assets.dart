@@ -64,6 +64,11 @@ abstract final class AppAssets {
   static const icAdvertisement = '$icons/ic_advertisement.svg';
   static const icCustom = '$icons/ic_custom.svg';
   static const icPlaylist = '$icons/ic_playlist.svg';
+  static const icPlaylistNext = '$icons/ic_playlist_next.svg';
+  static const icTimer = '$icons/ic_timer.svg';
+  static const icTimerFill = '$icons/ic_timer_fill.svg';
+  static const icContentSame = '$icons/ic_content_same.svg';
+  static const icRingtone = '$icons/ic_ringtone.svg';
 
   static const imgShare = '$images/img_share.png';
   static const icLauncherForeground = '$images/ic_launcher_foreground.webp';

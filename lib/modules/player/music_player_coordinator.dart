@@ -6,5 +6,7 @@ class MusicPlayerCoordinator extends GetxService {
 
   void show() => isOpen.value = true;
 
-  void hide() => isOpen.value = false;
+  void hide() {
+    if (isOpen.value) isOpen.value = false;
+  }
 }

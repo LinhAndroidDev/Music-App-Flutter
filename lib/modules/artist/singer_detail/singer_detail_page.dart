@@ -7,7 +7,7 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_icon.dart';
 import '../../library/widgets/library_song_row.dart';
-import '../../player/app_player_shell.dart';
+import '../../player/show_song_options.dart';
 import 'singer_detail_controller.dart';
 import 'widgets/singer_description_section.dart';
 import 'widgets/singer_follow_play_buttons.dart';
@@ -33,7 +33,7 @@ class SingerDetailPage extends GetView<SingerDetailController> {
           final name = s?.name ?? l10n.singer_info_empty;
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: AppPlayerShell.scrollListBottomInset),
+            padding: const EdgeInsets.only(bottom: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -111,11 +111,7 @@ class SingerDetailPage extends GetView<SingerDetailController> {
                             (song) => LibrarySongRow(
                               song: song,
                               onTap: () => controller.playSong(song),
-                              onMore: () => Get.snackbar(
-                                '',
-                                'Tính năng sắp có',
-                                snackPosition: SnackPosition.BOTTOM,
-                              ),
+                              onMore: () => showSongOptions(context, song),
                             ),
                           )
                           .toList(),

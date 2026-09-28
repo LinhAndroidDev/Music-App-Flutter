@@ -3,12 +3,13 @@ import 'package:get/get.dart';
 
 import '../../core/l10n/l10n.dart';
 import '../../core/theme/app_colors.dart';
-import '../player/app_player_shell.dart';
 import '../library/widgets/confirm_remove_song_dialog.dart';
 import '../library/widgets/library_subpage_header.dart';
 import '../library/widgets/library_song_row.dart';
 import '../library/widgets/song_arrangement_sheet.dart';
 import '../library/widgets/song_empty_state.dart';
+import '../player/show_song_options.dart';
+import '../player/song_options_config.dart';
 import 'favourite_song_controller.dart';
 
 class FavouriteSongPage extends GetView<FavouriteSongController> {
@@ -132,6 +133,17 @@ class FavouriteSongPage extends GetView<FavouriteSongController> {
                             final ok = await showConfirmRemoveSongDialog(context, song.title);
                             if (ok == true) await controller.removeFavourite(song);
                           },
+                          onMore: () => showSongOptions(
+                            context,
+                            song,
+                            config: SongOptionsConfig.favouriteList(
+                              onRemoveFavourite: () async {
+                                final ok =
+                                    await showConfirmRemoveSongDialog(context, song.title);
+                                if (ok == true) await controller.removeFavourite(song);
+                              },
+                            ),
+                          ),
                         );
                       },
                       childCount: songs.length,
@@ -139,7 +151,7 @@ class FavouriteSongPage extends GetView<FavouriteSongController> {
                   ),
                 ),
               const SliverToBoxAdapter(
-                child: SizedBox(height: AppPlayerShell.scrollListBottomInset),
+                child: const SizedBox(height: 24),
               ),
             ],
           );

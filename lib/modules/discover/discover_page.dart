@@ -15,6 +15,7 @@ import 'widgets/home_national_chip.dart';
 import 'widgets/home_release_song_row.dart';
 import 'widgets/home_section_title.dart';
 import 'widgets/home_topic_tile.dart';
+import '../player/show_song_options.dart';
 import 'widgets/home_zing_chart_card.dart';
 
 class DiscoverPage extends GetView<DiscoverController> {
@@ -115,6 +116,7 @@ class DiscoverPage extends GetView<DiscoverController> {
                       ),
                       pages: controller.releasePages,
                       onSongTap: controller.playLatestSong,
+                      onSongMore: (s) => showSongOptions(context, s),
                     ),
                   ),
                 ),
@@ -125,7 +127,7 @@ class DiscoverPage extends GetView<DiscoverController> {
                       chartDateLabel: l10n.preview_home_chart_date,
                       onSeeAll: controller.openZingChartTab,
                       onSongTap: controller.playChartSong,
-                      onSongMore: controller.playChartSong,
+                      onSongMore: (s) => showSongOptions(context, s),
                     ),
                   ),
                 ),
@@ -144,10 +146,12 @@ class _NewReleasePager extends StatefulWidget {
     super.key,
     required this.pages,
     required this.onSongTap,
+    required this.onSongMore,
   });
 
   final List<List<Song>> pages;
   final void Function(Song song) onSongTap;
+  final void Function(Song song) onSongMore;
 
   @override
   State<_NewReleasePager> createState() => _NewReleasePagerState();
@@ -190,7 +194,7 @@ class _NewReleasePagerState extends State<_NewReleasePager> {
                     (s) => HomeReleaseSongRow(
                       song: s,
                       onTap: () => widget.onSongTap(s),
-                      onMore: () => widget.onSongTap(s),
+                      onMore: () => widget.onSongMore(s),
                     ),
                   )
                   .toList(),

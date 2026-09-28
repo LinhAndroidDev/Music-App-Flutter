@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../../core/l10n/l10n.dart';
 import '../../core/navigation/app_route.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/widgets/custom_bottom_bar.dart';
 import '../discover/discover_page.dart';
 import '../library/library_page.dart';
 import '../profile/profile_page.dart';
@@ -27,11 +26,6 @@ class MainPage extends GetView<MainController> {
             _TabPlaceholder(tab: AppTab.radio),
             ProfilePage(),
           ],
-        ),
-        bottomNavigationBar: CustomBottomBar(
-          currentTab: controller.currentTab.value,
-          onTabSelected: controller.selectTab,
-          profilePhotoUrl: controller.profilePhotoUrl.value,
         ),
       ),
     );

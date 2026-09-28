@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../../core/assets/app_assets.dart';
 import '../../../core/navigation/app_navigate.dart';
+import '../../../core/navigation/app_navigation_route.dart';
 import '../../../core/playback/playback_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_icon.dart';
@@ -21,9 +22,14 @@ class MiniPlayerBar extends StatelessWidget {
     final playerUi = Get.find<MusicPlayerCoordinator>();
 
     return Obx(() {
+      final navRoute = Get.find<AppNavigationRoute>();
+      navRoute.currentRoute.value;
       final state = playback.playbackState.value;
       final isFavourite = player.isFavourite.value;
       final fullPlayerOpen = playerUi.isOpen.value;
+      if (!navRoute.showsAppChrome) {
+        return const SizedBox.shrink();
+      }
       if (!state.hasActivePlayer || state.currentSong == null) {
         return const SizedBox.shrink();
       }

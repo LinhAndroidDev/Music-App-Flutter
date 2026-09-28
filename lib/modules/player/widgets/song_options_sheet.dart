@@ -1,206 +1,682 @@
+import 'dart:async';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../core/assets/app_assets.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/playback/playback_controller.dart';
+import '../../../core/playback/playback_state.dart' as app_playback;
 import '../../../core/playback/sleep_timer_state.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_icon.dart';
+import '../../../core/widgets/service_music_dialog.dart';
+import '../../../data/models/song.dart';
+import '../../../data/services/favourite_song_repository.dart';
 import '../../discover/utils/format_duration.dart';
+import '../../library/widgets/confirm_remove_song_dialog.dart';
+import '../song_options_config.dart';
 
-class SongOptionsSheet extends StatelessWidget {
-  const SongOptionsSheet({super.key});
+const _sheetTopRadius = Radius.circular(15);
+const _iconSize = 25.0;
 
-  static Future<void> show(BuildContext context) {
+/// ServiceMusic [layout_bottom_sheet_option_music.xml].
+class SongOptionsSheet extends StatefulWidget {
+  const SongOptionsSheet({
+    super.key,
+    required this.song,
+    required this.config,
+  });
+
+  final Song song;
+  final SongOptionsConfig config;
+
+  static Future<void> show(
+    BuildContext context, {
+    required Song song,
+    SongOptionsConfig config = SongOptionsConfig.list,
+  }) {
     return showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.purpleDark2,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) => const SongOptionsSheet(),
+      backgroundColor: AppColors.white,
+      isScrollControlled: true,
+      shape: SongOptionsSheet.sheetShape,
+      builder: (ctx) => SongOptionsSheet(song: song, config: config),
     );
+  }
+
+  static ShapeBorder get sheetShape => const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: _sheetTopRadius),
+      );
+
+  @override
+  State<SongOptionsSheet> createState() => _SongOptionsSheetState();
+}
+
+class _SongOptionsSheetState extends State<SongOptionsSheet> {
+  final _favourites = Get.find<FavouriteSongRepository>();
+  StreamSubscription<bool>? _favSub;
+  bool _isFavourite = false;
+
+  Song get song => widget.song;
+
+  @override
+  void initState() {
+    super.initState();
+    _favSub = _favourites.watchIsFavourite(song.id).listen((v) {
+      if (mounted) setState(() => _isFavourite = v);
+    });
+  }
+
+  @override
+  void dispose() {
+    _favSub?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final playback = Get.find<PlaybackController>();
+    final config = widget.config;
 
     return SafeArea(
+      top: false,
       child: Obx(() {
         final timer = playback.sleepTimerState.value;
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                l10n.song_options,
-                style: const TextStyle(
-                  color: AppColors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+        final timerActive = config.showSleepTimer && timer.active;
+
+        return SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(5),
+                      child: SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: song.thumbnailUrl.isNotEmpty
+                            ? CachedNetworkImage(
+                                imageUrl: song.thumbnailUrl,
+                                fit: BoxFit.cover,
+                              )
+                            : const ColoredBox(color: AppColors.purpleDark1),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            song.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.textBlack,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            song.nameSinger,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: AppColors.txtHint,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Image.asset(AppAssets.imgShare, width: 25, height: 25),
+                  ],
                 ),
               ),
-            ),
-            _OptionTile(
-              title: l10n.sleep_timer_menu,
-              subtitle: timer.active ? _remainingLabel(l10n, timer) : null,
-              onTap: () => _openSleepTimer(context, playback),
-            ),
-            _OptionTile(
-              title: l10n.song_options_add_library,
-              onTap: () => _stub(context),
-            ),
-            _OptionTile(
-              title: l10n.song_options_add_playlist,
-              onTap: () => _stub(context),
-            ),
-            _OptionTile(
-              title: l10n.song_options_play_next,
-              onTap: () => _stub(context),
-            ),
-            const SizedBox(height: 8),
-          ],
+              const SizedBox(height: 15),
+              const _SheetDivider(),
+              if (config.showRemoveFromPlaylist)
+                _OptionMusicRow(
+                  marginTop: 10,
+                  icon: AppAssets.icRemove,
+                  title: l10n.playlist_remove_song,
+                  onTap: () => _removeFromPlaylist(context),
+                ),
+              if (config.showSleepTimer)
+                _OptionMusicRow(
+                  marginTop: 10,
+                  icon: timerActive ? AppAssets.icTimerFill : AppAssets.icTimer,
+                  iconColor: timerActive ? AppColors.purple1 : AppColors.black,
+                  title: l10n.sleep_timer_menu,
+                  titleColor:
+                      timerActive ? AppColors.purple1 : AppColors.textBlack,
+                  onTap: () => _SleepTimerSheet.show(context),
+                ),
+              _OptionMusicRow(
+                marginTop: 10,
+                icon: AppAssets.icDownloadThin,
+                title: l10n.download_action,
+                onTap: () => _stub(context),
+              ),
+              _OptionMusicRow(
+                icon: _isFavourite ? AppAssets.icFavouriteFill : AppAssets.icFavouriteThin,
+                iconColor: _isFavourite ? AppColors.purple1 : AppColors.black,
+                title: _isFavourite
+                    ? l10n.song_options_added_library
+                    : l10n.song_options_add_library,
+                onTap: () => _onFavouriteTap(context),
+              ),
+              _OptionMusicRow(
+                icon: AppAssets.icPlaylist,
+                title: l10n.playlist_add_title,
+                onTap: () => _stub(context),
+              ),
+              _OptionMusicRow(
+                icon: AppAssets.icContentSame,
+                title: l10n.song_options_play_similar,
+                onTap: () => _stub(context),
+              ),
+              _OptionMusicRow(
+                icon: AppAssets.icAddPlaylist,
+                title: l10n.song_options_add_playlist,
+                onTap: () => _stub(context),
+              ),
+              _OptionMusicRow(
+                icon: AppAssets.icPlaylistNext,
+                title: l10n.song_options_play_next,
+                onTap: () => _stub(context),
+              ),
+              _OptionMusicRow(
+                icon: AppAssets.icRingtone,
+                title: l10n.song_options_ringtone,
+                onTap: () => _stub(context),
+              ),
+              _OptionMusicRow(
+                icon: AppAssets.icLibraryMusic,
+                title: l10n.song_options_view_album,
+                onTap: () => _stub(context),
+              ),
+              _OptionMusicRow(
+                icon: AppAssets.icArtist,
+                title: l10n.song_options_view_artist,
+                onTap: () => _stub(context),
+              ),
+              _OptionMusicRow(
+                marginBottom: 30,
+                icon: AppAssets.icBlock,
+                title: l10n.song_options_block,
+                onTap: () => _stub(context),
+              ),
+            ],
+          ),
         );
       }),
     );
   }
 
-  String? _remainingLabel(dynamic l10n, SleepTimerState timer) {
-    if (timer.stopAtEndOfTrack) return l10n.sleep_timer_end_of_track;
-    final ends = timer.endsAtEpochMs;
-    if (ends == null) return null;
-    final remainingMs = ends - DateTime.now().millisecondsSinceEpoch;
-    if (remainingMs <= 0) return l10n.sleep_timer_expired;
-    return l10n.sleep_timer_remaining_text(
-      remaining: formatDurationMs(remainingMs),
-    );
+  Future<void> _onFavouriteTap(BuildContext context) async {
+    if (!_isFavourite) {
+      await _favourites.toggleFavourite(song);
+      return;
+    }
+    final custom = widget.config.onRemoveFavourite;
+    if (!context.mounted) return;
+    Navigator.pop(context);
+    if (custom != null) {
+      await custom();
+      return;
+    }
+    final ok = await showConfirmRemoveSongDialog(context, song.title);
+    if (ok == true) {
+      await _favourites.removeFavourite(song.id);
+    }
+  }
+
+  Future<void> _removeFromPlaylist(BuildContext context) async {
+    Navigator.pop(context);
+    await widget.config.onRemoveFromPlaylist?.call();
   }
 
   void _stub(BuildContext context) {
     Navigator.pop(context);
     Get.snackbar('', 'Tính năng sắp có', snackPosition: SnackPosition.BOTTOM);
   }
+}
 
-  Future<void> _openSleepTimer(BuildContext context, PlaybackController playback) async {
-    final l10n = context.l10n;
-    await showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: AppColors.purpleDark2,
-      builder: (ctx) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: Text(l10n.sleep_timer_title, style: const TextStyle(color: AppColors.white)),
-              ),
-              _sleepRow(ctx, l10n.sleep_timer_15, () => playback.setSleepTimer(SleepTimerOption.min15)),
-              _sleepRow(ctx, l10n.sleep_timer_30, () => playback.setSleepTimer(SleepTimerOption.min30)),
-              _sleepRow(ctx, l10n.sleep_timer_45, () => playback.setSleepTimer(SleepTimerOption.min45)),
-              _sleepRow(ctx, l10n.sleep_timer_60, () => playback.setSleepTimer(SleepTimerOption.hour1)),
-              _sleepRow(ctx, l10n.sleep_timer_end_of_track, () => playback.setSleepTimer(SleepTimerOption.endOfTrack)),
-              _sleepRow(ctx, l10n.sleep_timer_custom, () => _customTimer(ctx, playback, l10n)),
-              if (playback.sleepTimerState.value.active)
-                _sleepRow(ctx, l10n.sleep_timer_cancel, () => playback.cancelSleepTimer()),
-            ],
-          ),
-        );
-      },
-    );
-  }
+class _SheetDivider extends StatelessWidget {
+  const _SheetDivider();
 
-  Widget _sleepRow(BuildContext ctx, String label, VoidCallback onTap) {
-    return ListTile(
-      title: Text(label, style: const TextStyle(color: AppColors.white)),
-      onTap: () {
-        Navigator.pop(ctx);
-        onTap();
-      },
-    );
-  }
-
-  Future<void> _customTimer(
-    BuildContext ctx,
-    PlaybackController playback,
-    dynamic l10n,
-  ) async {
-    var hours = 0;
-    var minutes = 15;
-    await showDialog<void>(
-      context: ctx,
-      builder: (dialogCtx) {
-        return AlertDialog(
-          title: Text(l10n.sleep_timer_custom_title),
-          content: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              DropdownButton<int>(
-                value: hours,
-                items: List.generate(
-                  5,
-                  (h) => DropdownMenuItem(value: h, child: Text('$h ${l10n.sleep_timer_hours}')),
-                ),
-                onChanged: (v) => hours = v ?? 0,
-              ),
-              DropdownButton<int>(
-                value: minutes,
-                items: List.generate(
-                  12,
-                  (i) => DropdownMenuItem(
-                    value: i * 5,
-                    child: Text('${i * 5} ${l10n.sleep_timer_minutes}'),
-                  ),
-                ),
-                onChanged: (v) => minutes = v ?? 0,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogCtx),
-              child: Text(l10n.sleep_timer_cancel),
-            ),
-            TextButton(
-              onPressed: () {
-                final totalMs = (hours * 60 + minutes) * 60 * 1000;
-                if (totalMs < 60 * 1000) {
-                  Get.snackbar('', l10n.sleep_timer_custom_invalid);
-                  return;
-                }
-                Navigator.pop(dialogCtx);
-                Navigator.pop(ctx);
-                Navigator.pop(ctx);
-                playback.setSleepTimer(
-                  SleepTimerOption.custom,
-                  customDurationMs: totalMs,
-                );
-              },
-              child: Text(l10n.sleep_timer_confirm),
-            ),
-          ],
-        );
-      },
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(height: 0.8, color: AppColors.greyLight),
     );
   }
 }
 
-class _OptionTile extends StatelessWidget {
-  const _OptionTile({required this.title, this.subtitle, required this.onTap});
+class _OptionMusicRow extends StatelessWidget {
+  const _OptionMusicRow({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    this.iconColor = AppColors.black,
+    this.titleColor = AppColors.textBlack,
+    this.marginTop = 0,
+    this.marginBottom = 0,
+  });
 
+  final String icon;
+  final Color iconColor;
   final String title;
-  final String? subtitle;
+  final Color titleColor;
   final VoidCallback onTap;
+  final double marginTop;
+  final double marginBottom;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title, style: const TextStyle(color: AppColors.white)),
-      subtitle: subtitle != null
-          ? Text(subtitle!, style: TextStyle(color: AppColors.white.withOpacity(0.6)))
-          : null,
-      onTap: onTap,
+    return Padding(
+      padding: EdgeInsets.only(top: marginTop, bottom: marginBottom),
+      child: Material(
+        color: AppColors.white,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Row(
+              children: [
+                AppIcon(icon, size: _iconSize, color: iconColor),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(fontSize: 16, color: titleColor),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// ServiceMusic [layout_bottom_sheet_sleep_timer.xml] + [BottomSheetSleepTimer.kt].
+class _SleepTimerSheet extends StatefulWidget {
+  const _SleepTimerSheet();
+
+  static Future<void> show(BuildContext context) {
+    return showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.white,
+      shape: SongOptionsSheet.sheetShape,
+      builder: (ctx) => const _SleepTimerSheet(),
+    );
+  }
+
+  @override
+  State<_SleepTimerSheet> createState() => _SleepTimerSheetState();
+}
+
+class _SleepTimerSheetState extends State<_SleepTimerSheet> {
+  final _playback = Get.find<PlaybackController>();
+  Timer? _ticker;
+  Worker? _timerWorker;
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() {});
+    });
+    _timerWorker = ever(_playback.sleepTimerState, (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    _timerWorker?.dispose();
+    super.dispose();
+  }
+
+  int _remainingMs(SleepTimerState timer, app_playback.PlaybackState playback) {
+    if (!timer.active) return 0;
+    if (timer.stopAtEndOfTrack) {
+      return (playback.durationMs - playback.positionMs).clamp(0, 1 << 31);
+    }
+    final ends = timer.endsAtEpochMs;
+    if (ends == null) return 0;
+    return (ends - DateTime.now().millisecondsSinceEpoch).clamp(0, 1 << 31);
+  }
+
+  Future<void> _onOption(SleepTimerOption option) async {
+    final timer = _playback.sleepTimerState.value;
+    if (timer.active && timer.option == option) {
+      _playback.cancelSleepTimer();
+      if (mounted) Navigator.pop(context);
+      return;
+    }
+    if (option == SleepTimerOption.custom) {
+      await _showCustomDialog();
+      return;
+    }
+    await _playback.setSleepTimer(option);
+    if (mounted) Navigator.pop(context);
+  }
+
+  Future<void> _showCustomDialog() async {
+    await ServiceMusicDialog.show<void>(
+      context,
+      child: _CustomSleepTimerDialog(
+        onConfirm: (totalMs) {
+          Navigator.pop(context);
+          _playback.setSleepTimer(
+            SleepTimerOption.custom,
+            customDurationMs: totalMs,
+          );
+        },
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final timer = _playback.sleepTimerState.value;
+    final playback = _playback.playbackState.value;
+    final remainingMs = _remainingMs(timer, playback);
+
+    return SafeArea(
+      top: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Text(
+              l10n.sleep_timer_title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textBlack,
+              ),
+            ),
+          ),
+          const _SheetDivider(),
+          _SleepTimerOptionRow(
+            marginTop: 5,
+            option: SleepTimerOption.min15,
+            timer: timer,
+            remainingMs: remainingMs,
+            defaultLabel: l10n.sleep_timer_15,
+            l10n: l10n,
+            onTap: () => _onOption(SleepTimerOption.min15),
+          ),
+          _SleepTimerOptionRow(
+            option: SleepTimerOption.min30,
+            timer: timer,
+            remainingMs: remainingMs,
+            defaultLabel: l10n.sleep_timer_30,
+            l10n: l10n,
+            onTap: () => _onOption(SleepTimerOption.min30),
+          ),
+          _SleepTimerOptionRow(
+            option: SleepTimerOption.min45,
+            timer: timer,
+            remainingMs: remainingMs,
+            defaultLabel: l10n.sleep_timer_45,
+            l10n: l10n,
+            onTap: () => _onOption(SleepTimerOption.min45),
+          ),
+          _SleepTimerOptionRow(
+            option: SleepTimerOption.hour1,
+            timer: timer,
+            remainingMs: remainingMs,
+            defaultLabel: l10n.sleep_timer_60,
+            l10n: l10n,
+            onTap: () => _onOption(SleepTimerOption.hour1),
+          ),
+          _SleepTimerOptionRow(
+            option: SleepTimerOption.endOfTrack,
+            timer: timer,
+            remainingMs: remainingMs,
+            defaultLabel: l10n.sleep_timer_end_of_track,
+            l10n: l10n,
+            onTap: () => _onOption(SleepTimerOption.endOfTrack),
+          ),
+          _SleepTimerOptionRow(
+            marginBottom: 30,
+            option: SleepTimerOption.custom,
+            timer: timer,
+            remainingMs: remainingMs,
+            defaultLabel: l10n.sleep_timer_custom,
+            l10n: l10n,
+            onTap: () => _onOption(SleepTimerOption.custom),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SleepTimerOptionRow extends StatelessWidget {
+  const _SleepTimerOptionRow({
+    required this.option,
+    required this.timer,
+    required this.remainingMs,
+    required this.defaultLabel,
+    required this.l10n,
+    required this.onTap,
+    this.marginTop = 0,
+    this.marginBottom = 0,
+  });
+
+  final SleepTimerOption option;
+  final SleepTimerState timer;
+  final int remainingMs;
+  final String defaultLabel;
+  final dynamic l10n;
+  final VoidCallback onTap;
+  final double marginTop;
+  final double marginBottom;
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = timer.active && timer.option == option;
+    final remaining = formatDurationMs(remainingMs);
+
+    return Padding(
+      padding: EdgeInsets.only(top: marginTop, bottom: marginBottom),
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: isSelected
+              ? _CancelRemainingLabel(
+                  full: l10n.sleep_timer_cancel_remaining(remaining: remaining),
+                  highlight: l10n.sleep_timer_remaining_text(remaining: remaining),
+                )
+              : Text(
+                  defaultLabel,
+                  style: const TextStyle(fontSize: 16, color: AppColors.textBlack),
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CancelRemainingLabel extends StatelessWidget {
+  const _CancelRemainingLabel({required this.full, required this.highlight});
+
+  final String full;
+  final String highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    final start = full.indexOf(highlight);
+    if (start < 0) {
+      return Text(full, style: const TextStyle(fontSize: 16, color: AppColors.textBlack));
+    }
+    return Text.rich(
+      TextSpan(
+        style: const TextStyle(fontSize: 16, color: AppColors.textBlack),
+        children: [
+          TextSpan(text: full.substring(0, start)),
+          TextSpan(
+            text: highlight,
+            style: const TextStyle(color: AppColors.purple1),
+          ),
+          TextSpan(text: full.substring(start + highlight.length)),
+        ],
+      ),
+    );
+  }
+}
+
+class _CustomSleepTimerDialog extends StatefulWidget {
+  const _CustomSleepTimerDialog({required this.onConfirm});
+
+  final ValueChanged<int> onConfirm;
+
+  @override
+  State<_CustomSleepTimerDialog> createState() => _CustomSleepTimerDialogState();
+}
+
+class _CustomSleepTimerDialogState extends State<_CustomSleepTimerDialog> {
+  int _hours = 0;
+  int _minutes = 15;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ServiceMusicDialogTitle(l10n.sleep_timer_custom_title),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _PickerColumn(
+                label: l10n.sleep_timer_hours,
+                itemCount: 5,
+                initialItem: _hours,
+                labelBuilder: (i) => '$i',
+                onChanged: (v) => _hours = v,
+              ),
+              const SizedBox(width: 28),
+              _PickerColumn(
+                label: l10n.sleep_timer_minutes,
+                itemCount: 12,
+                initialItem: _minutes ~/ 5,
+                labelBuilder: (i) => '${i * 5}',
+                onChanged: (v) => _minutes = v * 5,
+              ),
+            ],
+          ),
+        ),
+        ServiceMusicDialogPrimaryButton(
+          label: l10n.sleep_timer_confirm,
+          onTap: () {
+            final totalMs = (_hours * 60 + _minutes) * 60 * 1000;
+            if (totalMs < 60 * 1000) {
+              Get.snackbar('', l10n.sleep_timer_custom_invalid);
+              return;
+            }
+            Navigator.pop(context);
+            widget.onConfirm(totalMs);
+          },
+        ),
+        ServiceMusicDialogCancelButton(
+          label: l10n.sleep_timer_cancel,
+          onTap: () => Navigator.pop(context),
+        ),
+      ],
+    );
+  }
+}
+
+class _PickerColumn extends StatefulWidget {
+  const _PickerColumn({
+    required this.label,
+    required this.itemCount,
+    required this.initialItem,
+    required this.labelBuilder,
+    required this.onChanged,
+  });
+
+  final String label;
+  final int itemCount;
+  final int initialItem;
+  final String Function(int index) labelBuilder;
+  final ValueChanged<int> onChanged;
+
+  @override
+  State<_PickerColumn> createState() => _PickerColumnState();
+}
+
+class _PickerColumnState extends State<_PickerColumn> {
+  late FixedExtentScrollController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = FixedExtentScrollController(
+      initialItem: widget.initialItem.clamp(0, widget.itemCount - 1),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: 120,
+          width: 72,
+          child: ListWheelScrollView.useDelegate(
+            itemExtent: 36,
+            diameterRatio: 1.4,
+            physics: const FixedExtentScrollPhysics(),
+            controller: _controller,
+            onSelectedItemChanged: widget.onChanged,
+            childDelegate: ListWheelChildBuilderDelegate(
+              childCount: widget.itemCount,
+              builder: (context, index) {
+                return Center(
+                  child: Text(
+                    widget.labelBuilder(index),
+                    style: const TextStyle(fontSize: 20, color: AppColors.textBlack),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        Text(widget.label, style: const TextStyle(fontSize: 14, color: AppColors.txtHint)),
+      ],
     );
   }
 }
