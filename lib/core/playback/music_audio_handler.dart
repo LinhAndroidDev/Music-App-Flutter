@@ -52,7 +52,7 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
       _emitUi(
         _uiState.copyWith(
           positionMs: pos.inMilliseconds,
-          durationMs: _player.duration?.inMilliseconds ?? _uiState.durationMs,
+          durationMs: _resolvedDurationMs(),
         ),
       );
       _broadcastPlaybackState();
@@ -72,6 +72,14 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
   Future<void> _configureAudioSession() async {
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration.music());
+  }
+
+  int _resolvedDurationMs() {
+    final fromPlayer = _player.duration?.inMilliseconds ?? 0;
+    if (fromPlayer > 0) return fromPlayer;
+    final songSec = _uiState.currentSong?.durationSec ?? 0;
+    if (songSec > 0) return songSec * 1000;
+    return _uiState.durationMs;
   }
 
   void _emitUi(app.PlaybackState state) {
@@ -149,6 +157,7 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
           hasActivePlayer: true,
           isShuffleEnabled: _queueRepo.isShuffleEnabled(),
           positionMs: startPositionMs,
+          durationMs: song.durationSec > 0 ? song.durationSec * 1000 : _uiState.durationMs,
         ),
       );
       if (autoStart) {
@@ -388,6 +397,16 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
     if (_historyRecordedForSongId == song.id) return;
     _historyRecordedForSongId = song.id;
     await _recentHistory.recordSong(song);
+  }
+
+  Future<void> dismissPlayback() async {
+    _cancelSleepTimerTimer();
+    _sleepTimer = SleepTimerState.idle;
+    await _player.stop();
+    _queueIndex = -1;
+    _historyRecordedForSongId = null;
+    _emitUi(app.PlaybackState.idle);
+    queue.add([]);
   }
 
   @override

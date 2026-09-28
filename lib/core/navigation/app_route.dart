@@ -16,6 +16,7 @@ abstract final class AppRoute {
   static const recentHistory = '/recent-history';
   static const followedSingers = '/followed-singers';
   static const addArtist = '/add-artist';
+  static const player = '/player';
 }
 
 /// Tab indices for [AppRoute.main] (matches [CustomBottomBar] order in ServiceMusic).
@@ -41,4 +42,7 @@ abstract final class AppRouteParam {
   static const playlistId = 'playlistId';
   static const playlistTitle = 'playlistTitle';
   static const playlistCoverUrl = 'playlistCoverUrl';
+
+  static const songId = 'songId';
+  static const preservePlayback = 'preservePlayback';
 }

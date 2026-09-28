@@ -1,6 +1,10 @@
 import 'package:get/get.dart';
 
+import '../../core/playback/playback_controller.dart';
+import '../../data/playback/song_playback_repository.dart';
 import '../../modules/main/main_controller.dart';
+import '../../modules/player/music_player_coordinator.dart';
+import '../../modules/player/player_binding.dart';
 import 'app_route.dart';
 
 /// Central navigation API (wraps GetX routing).
@@ -55,6 +59,54 @@ abstract final class AppNavigate {
     }
     if (Get.isRegistered<MainController>()) {
       Get.find<MainController>().selectTab(tab);
+    }
+  }
+
+  // --- Player ---
+
+  static Future<void>? _openPlayerFuture;
+
+  /// Shows full-screen player UI immediately (sync).
+  static void presentPlayerUi() {
+    PlayerBinding().dependencies();
+    Get.find<MusicPlayerCoordinator>().show();
+  }
+
+  static void closePlayer() {
+    if (Get.isRegistered<MusicPlayerCoordinator>()) {
+      Get.find<MusicPlayerCoordinator>().hide();
+    }
+  }
+
+  static Future<void> openPlayer({
+    String? songId,
+    bool preservePlayback = false,
+  }) {
+    presentPlayerUi();
+    return _openPlayerFuture ??= _openPlayerImpl(
+      songId: songId,
+      preservePlayback: preservePlayback,
+    ).whenComplete(() => _openPlayerFuture = null);
+  }
+
+  static Future<void> _openPlayerImpl({
+    String? songId,
+    bool preservePlayback = false,
+  }) async {
+    final playback = Get.find<PlaybackController>();
+    await playback.ensureReady();
+
+    if (!preservePlayback && songId != null && songId.isNotEmpty) {
+      final queue = Get.find<SongPlaybackRepository>();
+      final index = queue.ensureQueueForSongId(songId);
+      if (index >= 0) {
+        await playback.playSongAtIndex(index);
+      } else {
+        final song = queue.getSongById(songId);
+        if (song != null) {
+          await playback.playSong(song);
+        }
+      }
     }
   }
 

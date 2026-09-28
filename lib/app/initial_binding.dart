@@ -15,7 +15,10 @@ import '../data/playback/downloaded_song_repository.dart';
 import '../data/playback/downloaded_song_repository_stub.dart';
 import '../data/playback/playback_preferences.dart';
 import '../data/playback/playable_uri_resolver.dart';
+import '../data/lyrics/song_lyrics_loader.dart';
 import '../data/playback/song_playback_repository.dart';
+import '../modules/player/music_player_coordinator.dart';
+import '../modules/player/player_controller.dart';
 
 /// Global GetX services (Firebase Auth, Firestore).
 class InitialBinding extends Bindings {
@@ -39,5 +42,8 @@ class InitialBinding extends Bindings {
     Get.put<PlayableUriResolver>(PlayableUriResolver(), permanent: true);
     Get.put<MusicPlaybackRegistry>(MusicPlaybackRegistry(), permanent: true);
     Get.put<PlaybackController>(PlaybackController(), permanent: true);
+    Get.put<SongLyricsLoader>(SongLyricsLoader(), permanent: true);
+    Get.put<PlayerController>(PlayerController(), permanent: true);
+    Get.put<MusicPlayerCoordinator>(MusicPlayerCoordinator(), permanent: true);
   }
 }

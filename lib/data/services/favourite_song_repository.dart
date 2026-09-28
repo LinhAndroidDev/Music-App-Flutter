@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import '../../core/firebase/firebase_constants.dart';
 import '../models/auth_user.dart';
+import '../models/song.dart';
 import 'auth_repository.dart';
 
 class FavouriteSongRepository extends GetxService {
@@ -51,5 +52,38 @@ class FavouriteSongRepository extends GetxService {
         .collection(FirebaseConstants.usersCollection)
         .doc(uid)
         .collection(FirebaseConstants.favouriteSongsCollection);
+  }
+
+  Stream<bool> watchIsFavourite(String songId) {
+    if (songId.isEmpty) return Stream.value(false);
+    final user = _authRepository.currentUser.value;
+    if (user == null) return Stream.value(false);
+    return _favouriteCollection(user.uid).doc(songId).snapshots().map((s) => s.exists);
+  }
+
+  Future<bool> toggleFavourite(Song song) async {
+    if (song.id.isEmpty) return false;
+    final user = _authRepository.currentUser.value;
+    if (user == null) return false;
+    final ref = _favouriteCollection(user.uid).doc(song.id);
+    final snap = await ref.get();
+    if (snap.exists) {
+      await ref.delete();
+      return false;
+    }
+    await ref.set({
+      'songId': song.id,
+      'title': song.title,
+      'nameSinger': song.nameSinger,
+      'thumbnailUrl': song.thumbnailUrl,
+      'audioUrl': song.audioUrl,
+      'lyricUrl': song.lyricUrl,
+      'durationSec': song.durationSec,
+      'categoryId': song.categoryId,
+      'categoryName': song.categoryName,
+      'views': song.views,
+      'addedAt': FieldValue.serverTimestamp(),
+    });
+    return true;
   }
 }

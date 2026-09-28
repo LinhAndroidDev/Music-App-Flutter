@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:audio_service/audio_service.dart' hide PlaybackState;
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+import '../../core/navigation/app_navigate.dart';
 import '../../data/models/song.dart';
 import '../../data/playback/playback_preferences.dart';
 import '../../data/playback/song_playback_repository.dart';
@@ -27,6 +29,7 @@ class PlaybackController extends GetxController {
   final sleepTimerState = SleepTimerState.idle.obs;
 
   StreamSubscription<PlaybackState>? _stateSub;
+  StreamSubscription<void>? _notificationTapSub;
   MusicAudioHandler? _handler;
 
   MusicAudioHandler get handler {
@@ -43,11 +46,29 @@ class PlaybackController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    Future.microtask(() {
-      if (MusicPlaybackService.isReady) {
-        _bindHandlerStreams();
-      }
+    Future.microtask(() async {
+      await MusicPlaybackService.init();
+      _bindHandlerStreams();
+      _bindNotificationTap();
     });
+  }
+
+  void _bindNotificationTap() {
+    _notificationTapSub?.cancel();
+    _notificationTapSub = AudioService.notificationClicked.listen((clicked) {
+      if (!clicked) return;
+      unawaited(_openPlayerFromNotification());
+    });
+  }
+
+  Future<void> _openPlayerFromNotification() async {
+    await AppNavigate.openPlayer(preservePlayback: true);
+  }
+
+  Future<void> dismissMiniPlayer() async {
+    await ensureReady();
+    await handler.dismissPlayback();
+    playbackState.value = PlaybackState.idle;
   }
 
   void _bindHandlerStreams() {
@@ -56,7 +77,10 @@ class PlaybackController extends GetxController {
     playbackState.value = h.uiState;
     sleepTimerState.value = h.sleepTimerState;
     _stateSub?.cancel();
-    _stateSub = h.uiStateStream.listen((s) => playbackState.value = s);
+    _stateSub = h.uiStateStream.listen((s) {
+      playbackState.value = s;
+      playbackState.refresh();
+    });
   }
 
   Future<void> ensureReady() async {
@@ -157,6 +181,7 @@ class PlaybackController extends GetxController {
   @override
   void onClose() {
     _stateSub?.cancel();
+    _notificationTapSub?.cancel();
     super.onClose();
   }
 }

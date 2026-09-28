@@ -44,11 +44,11 @@ class MusicPlaybackService {
 
   static Future<void> _doInit(MusicPlaybackRegistry reg) async {
     try {
-      if (_isAudioServiceInitialized()) {
-        if (reg.handler != null) return;
+      if (_isAudioServiceInitialized() && reg.handler == null) {
         throw StateError(
-          'Audio service đã chạy nhưng mất handler (thường do hot reload). '
-          'Stop app và chạy lại bằng flutter run — không dùng hot reload sau khi sửa playback.',
+          'Không khôi phục được audio handler. '
+          'Thoát hẳn app (swipe khỏi recent apps) rồi chạy lại flutter run. '
+          'Nếu vẫn lỗi: kiểm tra AndroidManifest (AudioService) và MainActivity.',
         );
       }
 
@@ -73,8 +73,8 @@ class MusicPlaybackService {
       reg.initFuture = null;
       if (_isAudioServiceInitialized()) {
         throw StateError(
-          'Audio service đã được khởi tạo. Stop app và chạy lại (flutter run), '
-          'không hot reload khi đang phát nhạc.',
+          'AudioService.init đã được gọi trước đó trong process này. '
+          'Stop app hoàn toàn rồi chạy lại flutter run.',
         );
       }
       if (kDebugMode) {
@@ -83,6 +83,11 @@ class MusicPlaybackService {
       rethrow;
     } catch (e, st) {
       reg.initFuture = null;
+      if (e is! StateError && _isAudioServiceInitialized() && reg.handler == null) {
+        throw StateError(
+          'Khởi tạo phát nhạc thất bại (thường do thiếu cấu hình Android AudioService): $e',
+        );
+      }
       Error.throwWithStackTrace(e, st);
     }
   }

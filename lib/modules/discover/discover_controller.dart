@@ -165,11 +165,15 @@ class DiscoverController extends BaseController {
 
   Future<void> _playSafely(Future<bool> Function() play) async {
     try {
+      AppNavigate.presentPlayerUi();
       final ok = await play();
       if (!ok) {
+        AppNavigate.closePlayer();
         _showPlaybackError('Không thể phát bài hát này');
+        return;
       }
     } on StateError catch (e) {
+      AppNavigate.closePlayer();
       _showPlaybackError(e.message);
     } catch (_) {
       _showPlaybackError('Không thể phát bài hát này');

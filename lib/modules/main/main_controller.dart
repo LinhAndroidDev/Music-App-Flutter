@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
 
 import '../../core/base/base_controller.dart';
+import '../../core/navigation/app_navigate.dart';
 import '../../core/navigation/app_route.dart';
+import '../../core/playback/playback_controller.dart';
 import '../../data/services/auth_repository.dart';
 
 /// Used by [AppNavigate.switchMainTab] when [AppRoute.main] is active.
@@ -30,6 +32,16 @@ class MainController extends BaseController implements MainTabController {
       ever(auth.currentUser, (user) {
         profilePhotoUrl.value = user?.photoUrl;
       });
+    }
+
+    _closePlayerIfNothingPlaying();
+  }
+
+  void _closePlayerIfNothingPlaying() {
+    if (!Get.isRegistered<PlaybackController>()) return;
+    final state = Get.find<PlaybackController>().playbackState.value;
+    if (!state.hasActivePlayer || state.currentSong == null) {
+      AppNavigate.closePlayer();
     }
   }
 

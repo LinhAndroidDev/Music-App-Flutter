@@ -35,6 +35,8 @@ abstract final class AppAssets {
   static const icDownload = '$icons/ic_download.svg';
   static const icDownloadThin = '$icons/ic_download_thin.svg';
   static const icMenu = '$icons/ic_menu.svg';
+  static const icShare = '$icons/ic_share.svg';
+  static const icClose = '$icons/close.svg';
   static const icSetting = '$icons/ic_setting.svg';
   static const icHeadphone = '$icons/ic_headphone.svg';
   static const icMicro = '$icons/ic_micro.svg';
