@@ -7,6 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_icon.dart';
 import 'add_artist_controller.dart';
 import 'widgets/add_artist_grid_tile.dart';
+import 'widgets/add_artist_search_bar.dart';
 
 class AddArtistPage extends GetView<AddArtistController> {
   const AddArtistPage({super.key});
@@ -21,77 +22,101 @@ class AddArtistPage extends GetView<AddArtistController> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: Row(
                 children: [
-                  IconButton(
-                    onPressed: Get.back,
-                    icon: const AppIcon(AppAssets.icClose, size: 24, color: AppColors.black),
+                  InkWell(
+                    onTap: Get.back,
+                    child: const AppIcon(AppAssets.icRemove, size: 25, color: AppColors.black),
                   ),
                   Expanded(
                     child: Text(
                       l10n.artist_add,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textBlack,
+                      ),
                     ),
                   ),
-                  Obx(
-                    () => TextButton(
-                      onPressed: controller.isSaving.value ? null : controller.complete,
-                      child: Text(l10n.artist_add_complete),
-                    ),
-                  ),
+                  const SizedBox(width: 25),
                 ],
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: l10n.artist_add_search_hint,
-                  prefixIcon: const AppIcon(AppAssets.icSearch, size: 20, color: AppColors.txtHint),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                ),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: AddArtistSearchBar(
+                hintText: l10n.artist_add_search_hint,
                 onChanged: controller.setQuery,
               ),
             ),
             Expanded(
-              child: Obx(() {
-                if (controller.isLoading.value) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                controller.selectedIds.length;
-                final singers = controller.visibleSingers;
-                if (singers.isEmpty) {
-                  return Center(
-                    child: Text(
-                      l10n.artist_add_empty,
-                      style: const TextStyle(color: AppColors.txtHint),
-                    ),
-                  );
-                }
-                final selected = controller.selectedIds;
-                return GridView.builder(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 0.72,
-                  ),
-                  itemCount: singers.length,
-                  itemBuilder: (context, index) {
-                    final singer = singers[index];
-                    return AddArtistGridTile(
-                      singer: singer,
-                      selected: selected.contains(singer.id),
-                      onTap: () => controller.toggleSelection(singer.id),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  controller.selectedIds.length;
+                  final singers = controller.visibleSingers;
+                  if (singers.isEmpty) {
+                    return Center(
+                      child: Text(
+                        l10n.artist_add_empty,
+                        style: const TextStyle(fontSize: 14, color: AppColors.txtHint),
+                      ),
                     );
-                  },
-                );
-              }),
+                  }
+                  final selected = controller.selectedIds;
+                  return GridView.builder(
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 16),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 0,
+                      crossAxisSpacing: 0,
+                      childAspectRatio: 0.72,
+                    ),
+                    itemCount: singers.length,
+                    itemBuilder: (context, index) {
+                      final singer = singers[index];
+                      return AddArtistGridTile(
+                        singer: singer,
+                        selected: selected.contains(singer.id),
+                        onTap: () => controller.toggleSelection(singer.id),
+                      );
+                    },
+                  );
+                }),
+              ),
             ),
+            Obx(() {
+              final saving = controller.isSaving.value;
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                child: Center(
+                  child: Material(
+                    color: AppColors.purple1,
+                    borderRadius: BorderRadius.circular(25),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(25),
+                      onTap: saving ? null : controller.complete,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 8),
+                        child: Text(
+                          l10n.artist_add_complete,
+                          style: TextStyle(
+                            color: AppColors.white.withOpacity(saving ? 0.6 : 1),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
           ],
         ),
       ),

@@ -76,10 +76,17 @@ class AddArtistController extends BaseController {
           return;
         }
       }
-      if (l10n != null) {
-        Get.snackbar('', l10n.artist_followed_toast, snackPosition: SnackPosition.BOTTOM);
-      }
+      // Pop before snackbar — Get.back() after Get.snackbar only closes the snackbar overlay.
       Get.back();
+      if (l10n != null) {
+        Future.microtask(
+          () => Get.snackbar(
+            '',
+            l10n.artist_followed_toast,
+            snackPosition: SnackPosition.BOTTOM,
+          ),
+        );
+      }
     } finally {
       isSaving.value = false;
     }
