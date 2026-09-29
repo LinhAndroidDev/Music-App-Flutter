@@ -7,6 +7,7 @@ import '../data/services/firestore_music_repository.dart';
 import '../data/services/home_catalog_service.dart';
 import '../data/services/followed_singer_repository.dart';
 import '../data/services/playlist_repository.dart';
+import '../data/search/search_history_repository.dart';
 import '../data/services/recent_history_repository.dart';
 import '../data/services/user_repository.dart';
 import '../core/playback/music_playback_registry.dart';
@@ -36,6 +37,7 @@ class InitialBinding extends Bindings {
     Get.put<FollowedSingerRepository>(FollowedSingerRepository(), permanent: true);
     Get.put<PlaylistRepository>(PlaylistRepository(), permanent: true);
     Get.put<RecentHistoryRepository>(RecentHistoryRepository(), permanent: true);
+    Get.put<SearchHistoryRepository>(SearchHistoryRepository(), permanent: true);
     Get.put<DownloadedSongRepository>(
       DownloadedSongRepositoryStub(),
       permanent: true,

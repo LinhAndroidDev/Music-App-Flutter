@@ -12,6 +12,8 @@ import '../modules/artist/singer_detail/singer_detail_page.dart';
 import '../modules/category/category_songs_binding.dart';
 import '../modules/category/category_songs_page.dart';
 import '../modules/common/stack_page.dart';
+import '../modules/search/search_binding.dart';
+import '../modules/search/search_page.dart';
 import '../modules/downloaded/downloaded_songs_binding.dart';
 import '../modules/downloaded/downloaded_songs_page.dart';
 import '../modules/favourite/favourite_song_binding.dart';
@@ -60,7 +62,8 @@ class AppPages {
     ),
     GetPage(
       name: AppRoute.searchSong,
-      page: () => Builder(builder: searchSongPage),
+      page: () => const SearchPage(),
+      binding: SearchBinding(),
     ),
     GetPage(
       name: AppRoute.singerDetail,

@@ -62,14 +62,6 @@ Widget categorySongsPage(BuildContext context) {
   );
 }
 
-Widget searchSongPage(BuildContext context) {
-  final query = _param(AppRouteParam.committedQuery);
-  return StackPage(
-    title: context.l10n.search_section_songs,
-    subtitle: query.isNotEmpty ? 'query=$query' : null,
-  );
-}
-
 Widget singerDetailPage(BuildContext context) {
   return StackPage(
     title: context.l10n.artist_info_title,
