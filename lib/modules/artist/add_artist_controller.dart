@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '../../core/base/base_controller.dart';
 import '../../core/l10n/l10n.dart';
+import '../../core/widgets/app_toast.dart';
 import '../../data/models/firestore_song.dart';
 import '../../data/services/firestore_music_repository.dart';
 import '../../data/services/followed_singer_repository.dart';
@@ -58,7 +59,7 @@ class AddArtistController extends BaseController {
     final l10n = Get.context?.l10n;
     if (selectedIds.isEmpty) {
       if (l10n != null) {
-        Get.snackbar('', l10n.artist_add_select_required, snackPosition: SnackPosition.BOTTOM);
+        showAppToast(l10n.artist_add_select_required, category: AppToastCategory.artist);
       }
       return;
     }
@@ -71,20 +72,15 @@ class AddArtistController extends BaseController {
         final result = await _followed.follow(singer);
         if (result == FollowMutationResult.requiresLogin) {
           if (l10n != null) {
-            Get.snackbar('', l10n.artist_login_message, snackPosition: SnackPosition.BOTTOM);
+            showAppToast(l10n.artist_login_message, category: AppToastCategory.artist);
           }
           return;
         }
       }
-      // Pop before snackbar — Get.back() after Get.snackbar only closes the snackbar overlay.
       Get.back();
       if (l10n != null) {
         Future.microtask(
-          () => Get.snackbar(
-            '',
-            l10n.artist_followed_toast,
-            snackPosition: SnackPosition.BOTTOM,
-          ),
+          () => showAppToast(l10n.artist_followed_toast, category: AppToastCategory.artist),
         );
       }
     } finally {

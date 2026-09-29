@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import '../assets/app_assets.dart';
 import '../navigation/app_navigate.dart';
+import 'app_toast.dart';
 import '../theme/app_colors.dart';
 import 'app_icon.dart';
 
@@ -48,8 +48,7 @@ class ScreenHeader extends StatelessWidget {
           if (showMicrophone) ...[
             InkWell(
               onTap: onMicrophone ??
-                  () => Get.snackbar('', 'Tính năng sắp có',
-                      snackPosition: SnackPosition.BOTTOM),
+                  () => showAppToast('Tính năng sắp có'),
               child: AppIcon(AppAssets.icMicro, size: 25, color: AppColors.black),
             ),
             const SizedBox(width: 20),

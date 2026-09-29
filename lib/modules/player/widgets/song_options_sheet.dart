@@ -11,11 +11,13 @@ import '../../../core/playback/playback_state.dart' as app_playback;
 import '../../../core/playback/sleep_timer_state.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_icon.dart';
+import '../../../core/widgets/app_toast.dart';
 import '../../../core/widgets/service_music_dialog.dart';
 import '../../../data/models/song.dart';
 import '../../../data/services/favourite_song_repository.dart';
 import '../../discover/utils/format_duration.dart';
 import '../../library/widgets/confirm_remove_song_dialog.dart';
+import '../../playlist/widgets/pick_playlist_sheet.dart';
 import '../song_options_config.dart';
 
 const _sheetTopRadius = Radius.circular(15);
@@ -177,7 +179,7 @@ class _SongOptionsSheetState extends State<SongOptionsSheet> {
               _OptionMusicRow(
                 icon: AppAssets.icPlaylist,
                 title: l10n.playlist_add_title,
-                onTap: () => _stub(context),
+                onTap: () => _onAddToPlaylist(context),
               ),
               _OptionMusicRow(
                 icon: AppAssets.icContentSame,
@@ -187,7 +189,7 @@ class _SongOptionsSheetState extends State<SongOptionsSheet> {
               _OptionMusicRow(
                 icon: AppAssets.icAddPlaylist,
                 title: l10n.song_options_add_playlist,
-                onTap: () => _stub(context),
+                onTap: () => _onAddToPlaylist(context),
               ),
               _OptionMusicRow(
                 icon: AppAssets.icPlaylistNext,
@@ -245,9 +247,14 @@ class _SongOptionsSheetState extends State<SongOptionsSheet> {
     await widget.config.onRemoveFromPlaylist?.call();
   }
 
+  Future<void> _onAddToPlaylist(BuildContext context) async {
+    Navigator.pop(context);
+    await PickPlaylistSheet.show(context, song);
+  }
+
   void _stub(BuildContext context) {
     Navigator.pop(context);
-    Get.snackbar('', 'Tính năng sắp có', snackPosition: SnackPosition.BOTTOM);
+    showAppToast('Tính năng sắp có');
   }
 }
 
@@ -596,7 +603,7 @@ class _CustomSleepTimerDialogState extends State<_CustomSleepTimerDialog> {
           onTap: () {
             final totalMs = (_hours * 60 + _minutes) * 60 * 1000;
             if (totalMs < 60 * 1000) {
-              Get.snackbar('', l10n.sleep_timer_custom_invalid);
+              showAppToast(l10n.sleep_timer_custom_invalid, category: AppToastCategory.player);
               return;
             }
             Navigator.pop(context);

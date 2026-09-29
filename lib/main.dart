@@ -8,6 +8,7 @@ import 'core/l10n/l10n.dart';
 import 'core/theme/app_theme.dart';
 import 'firebase_options.dart';
 import 'core/navigation/app_navigation_route.dart';
+import 'core/navigation/app_shell_modal_observer.dart';
 import 'modules/player/app_player_shell.dart';
 
 Future<void> main() async {
@@ -15,6 +16,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Before [GetMaterialApp] builds — [navigatorObservers] needs [AppShellModalObserver].
+  InitialBinding().dependencies();
   runApp(const MusicApp());
 }
 
@@ -33,6 +36,7 @@ class MusicApp extends StatelessWidget {
       initialBinding: InitialBinding(),
       initialRoute: AppPages.initial,
       getPages: AppPages.pages,
+      navigatorObservers: [Get.find<AppShellModalObserver>()],
       routingCallback: (routing) {
         if (Get.isRegistered<AppNavigationRoute>()) {
           Get.find<AppNavigationRoute>().updateRoute(routing?.current);

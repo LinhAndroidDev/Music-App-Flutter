@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '../../core/base/base_controller.dart';
 import '../../core/l10n/l10n.dart';
+import '../../core/widgets/app_toast.dart';
 import '../../data/services/auth_repository.dart';
 
 class ProfileController extends BaseController {
@@ -31,11 +32,11 @@ class ProfileController extends BaseController {
       case GoogleSignInStatus.cancelled:
         break;
       case GoogleSignInStatus.configMissing:
-        Get.snackbar('', l10n.auth_config_missing);
+        showAppToast(l10n.auth_config_missing, category: AppToastCategory.auth);
       case GoogleSignInStatus.invalidCredential:
-        Get.snackbar('', l10n.auth_invalid_credential);
+        showAppToast(l10n.auth_invalid_credential, category: AppToastCategory.auth);
       case GoogleSignInStatus.unavailable:
-        Get.snackbar('', l10n.auth_google_unavailable);
+        showAppToast(l10n.auth_google_unavailable, category: AppToastCategory.auth);
     }
   }
 }

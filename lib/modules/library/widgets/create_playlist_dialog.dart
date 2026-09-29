@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_toast.dart';
 import '../../../core/widgets/service_music_dialog.dart';
 
 class CreatePlaylistResult {
@@ -44,7 +45,7 @@ class _CreatePlaylistDialogState extends State<CreatePlaylistDialog> {
     final l10n = context.l10n;
     final title = _titleController.text.trim();
     if (title.isEmpty) {
-      Get.snackbar('', l10n.playlist_name_required, snackPosition: SnackPosition.BOTTOM);
+      showAppToast(l10n.playlist_name_required, category: AppToastCategory.playlist);
       return;
     }
     Get.back(result: CreatePlaylistResult(title: title, isPublic: _isPublic));

@@ -9,6 +9,9 @@ import 'app_route.dart';
 class AppNavigationRoute extends GetxService {
   final currentRoute = AppRoute.splash.obs;
 
+  /// Root navigator modal routes (bottom sheets, dialogs) — chrome hides while > 0.
+  final modalRouteCount = 0.obs;
+
   String? _pendingRoute;
   bool _routeUpdateScheduled = false;
 
@@ -51,6 +54,7 @@ class AppNavigationRoute extends GetxService {
 
   /// Bottom bar + mini player chrome (hidden on splash, add artist, full player).
   bool get showsAppChrome {
+    if (modalRouteCount.value > 0) return false;
     if (!chromeAllowedForRoute(currentRoute.value)) return false;
     if (Get.isRegistered<MusicPlayerCoordinator>() &&
         Get.find<MusicPlayerCoordinator>().isOpen.value) {

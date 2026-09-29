@@ -12,12 +12,22 @@ import 'app_route.dart';
 abstract final class AppNavigate {
   AppNavigate._();
 
+  /// Pops after the current frame — avoids `Navigator._debugLocked` during gestures/transitions.
   static void back<T>({T? result}) {
-    Get.back<T>(result: result);
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      final navigator = Get.key.currentState;
+      if (navigator != null && navigator.canPop()) {
+        navigator.pop<T>(result);
+        return;
+      }
+      if (Get.isOverlaysOpen || Get.isDialogOpen == true || Get.isBottomSheetOpen == true) {
+        Get.back<T>(result: result);
+      }
+    });
   }
 
   static void backUntilMain() {
-    Get.until((route) => route.settings.name == AppRoute.main);
+    _returnToMainStack(preserveCurrentTab: true);
   }
 
   static void offAllNamed(
@@ -57,11 +67,21 @@ abstract final class AppNavigate {
     if (!Get.isRegistered<MainController>()) return;
     Get.find<MainController>().selectTab(tab);
     if (_isMainTopRoute) return;
-    if (Get.key.currentState?.canPop() ?? false) {
-      Get.until((route) => route.settings.name == AppRoute.main);
-      return;
-    }
-    toMain(tab: tab);
+    _returnToMainStack(tab: tab);
+  }
+
+  /// Clears stack screens back to main — avoids [HeroController] failures from [Get.until]/popUntil.
+  static void _returnToMainStack({int? tab, bool preserveCurrentTab = false}) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (!Get.isRegistered<MainController>()) return;
+      final main = Get.find<MainController>();
+      final tabIndex =
+          preserveCurrentTab ? main.currentTab.value : (tab ?? main.currentTab.value);
+      Get.offAllNamed(
+        AppRoute.main,
+        parameters: {AppRouteParam.tab: '$tabIndex'},
+      );
+    });
   }
 
   /// Top GetX route is main (not a stack screen pushed on top).

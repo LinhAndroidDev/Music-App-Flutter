@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../navigation/navigator_after_frame.dart';
 import '../theme/app_colors.dart';
 
 /// White rounded card used by ServiceMusic [layout_dialog_confirm] / [layout_dialog_create_playlist].
@@ -12,11 +13,14 @@ class ServiceMusicDialog extends StatelessWidget {
   final Widget child;
 
   static Future<T?> show<T>(BuildContext context, {required Widget child}) {
-    return showDialog<T>(
-      context: context,
-      barrierColor: Colors.black54,
-      builder: (ctx) => ServiceMusicDialog(child: child),
-    );
+    return runNavigatorActionAfterFrame(() {
+      if (!context.mounted) return null;
+      return showDialog<T>(
+        context: context,
+        barrierColor: Colors.black54,
+        builder: (ctx) => ServiceMusicDialog(child: child),
+      );
+    });
   }
 
   @override

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../core/base/base_controller.dart';
 import '../../core/l10n/l10n.dart';
 import '../../core/navigation/app_navigate.dart';
+import '../../core/widgets/app_toast.dart';
 import '../../data/playback/downloaded_song_repository.dart';
 import '../../data/models/song.dart';
 import '../../data/services/favourite_song_repository.dart';
@@ -31,7 +32,7 @@ class LibraryController extends BaseController {
         AppNavigate.toFollowedSingers();
       case 3:
       case 4:
-        Get.snackbar('', 'Tính năng sắp có', snackPosition: SnackPosition.BOTTOM);
+        showAppToast('Tính năng sắp có');
     }
   }
 
@@ -53,18 +54,20 @@ class LibraryController extends BaseController {
     );
     if (result == null) return;
 
-    final mutation = await _playlists.createPlaylist(
+    final write = await _playlists.createPlaylist(
       title: result.title,
       isPublic: result.isPublic,
     );
-    switch (mutation) {
+    switch (write.status) {
       case PlaylistMutationResult.success:
-        Get.snackbar('', l10n.playlist_created, snackPosition: SnackPosition.BOTTOM);
+        showAppToast(l10n.playlist_created, category: AppToastCategory.playlist);
       case PlaylistMutationResult.requiresLogin:
-        Get.snackbar('', l10n.playlist_login_required, snackPosition: SnackPosition.BOTTOM);
+        showAppToast(l10n.playlist_login_required, category: AppToastCategory.playlist);
+      case PlaylistMutationResult.offline:
+        showAppToast(l10n.playlist_offline, category: AppToastCategory.playlist);
       case PlaylistMutationResult.failure:
-        Get.snackbar('', l10n.playlist_operation_failed, snackPosition: SnackPosition.BOTTOM);
-      default:
+        showAppToast(l10n.playlist_operation_failed, category: AppToastCategory.playlist);
+      case PlaylistMutationResult.alreadyExists:
         break;
     }
   }

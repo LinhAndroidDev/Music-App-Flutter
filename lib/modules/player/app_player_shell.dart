@@ -71,6 +71,7 @@ class _AppPlayerShellState extends State<AppPlayerShell> {
 
     _workers.addAll([
       ever(_navRoute.currentRoute, (_) => scheduleRebuild()),
+      ever(_navRoute.modalRouteCount, (_) => scheduleRebuild()),
       ever(_coordinator.isOpen, (_) => scheduleRebuild()),
       ever(_playback.playbackState, (_) => scheduleRebuild()),
       ever(_main.currentTab, (_) => scheduleRebuild()),
@@ -117,9 +118,12 @@ class _AppPlayerShellState extends State<AppPlayerShell> {
         Positioned.fill(
           child: MediaQuery(
             data: childMediaQuery,
-            child: ColoredBox(
-              color: AppColors.background,
-              child: widget.child ?? const SizedBox.shrink(),
+            child: HeroMode(
+              enabled: false,
+              child: ColoredBox(
+                color: AppColors.background,
+                child: widget.child ?? const SizedBox.shrink(),
+              ),
             ),
           ),
         ),

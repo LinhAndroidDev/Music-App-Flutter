@@ -1,6 +1,13 @@
 {
   "@@locale": "vi",
   "app_name": "Music App",
+  "toast_title_general": "Thông báo",
+  "toast_title_playlist": "Playlist",
+  "toast_title_favourite": "Bài hát yêu thích",
+  "toast_title_artist": "Ca sĩ",
+  "toast_title_auth": "Đăng nhập",
+  "toast_title_playback": "Phát nhạc",
+  "toast_title_player": "Trình phát",
   "splash_tagline": "Nghe nhạc mọi lúc",
   "hello_blank_fragment": "Hello blank fragment",
   "toast_added_favourite": "Đã thêm vào bài hát yêu thích",

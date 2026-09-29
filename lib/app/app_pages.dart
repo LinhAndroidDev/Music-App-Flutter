@@ -18,6 +18,12 @@ import '../modules/favourite/favourite_song_binding.dart';
 import '../modules/favourite/favourite_song_page.dart';
 import '../modules/main/main_binding.dart';
 import '../modules/main/main_page.dart';
+import '../modules/playlist/add_songs/add_playlist_songs_binding.dart';
+import '../modules/playlist/add_songs/add_playlist_songs_page.dart';
+import '../modules/playlist/detail/playlist_detail_binding.dart';
+import '../modules/playlist/detail/playlist_detail_page.dart';
+import '../modules/playlist/edit/edit_playlist_binding.dart';
+import '../modules/playlist/edit/edit_playlist_page.dart';
 import '../modules/splash/splash_binding.dart';
 import '../modules/splash/splash_page.dart';
 
@@ -63,20 +69,18 @@ class AppPages {
     ),
     GetPage(
       name: AppRoute.playlistDetail,
-      page: () => Builder(builder: playlistDetailPage),
+      page: () => const PlaylistDetailPage(),
+      binding: PlaylistDetailBinding(),
     ),
     GetPage(
       name: AppRoute.addPlaylistSongs,
-      page: () => Builder(
-        builder: (context) =>
-            playlistIdPage(context, context.l10n.playlist_add_songs_title),
-      ),
+      page: () => const AddPlaylistSongsPage(),
+      binding: AddPlaylistSongsBinding(),
     ),
     GetPage(
       name: AppRoute.editPlaylist,
-      page: () => Builder(
-        builder: (context) => playlistIdPage(context, context.l10n.playlist_edit_title),
-      ),
+      page: () => const EditPlaylistPage(),
+      binding: EditPlaylistBinding(),
     ),
     GetPage(
       name: AppRoute.recentHistory,

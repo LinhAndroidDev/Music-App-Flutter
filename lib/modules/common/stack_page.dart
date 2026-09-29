@@ -76,20 +76,3 @@ Widget singerDetailPage(BuildContext context) {
     subtitle: 'singerId=${_param(AppRouteParam.singerId)}',
   );
 }
-
-Widget playlistDetailPage(BuildContext context) {
-  final l10n = context.l10n;
-  final title = _param(AppRouteParam.playlistTitle);
-  return StackPage(
-    title: title.isNotEmpty ? title : l10n.playlist_section_title,
-    subtitle:
-        'id=${_param(AppRouteParam.playlistId)}\ncover=${_param(AppRouteParam.playlistCoverUrl)}',
-  );
-}
-
-Widget playlistIdPage(BuildContext context, String screenTitle) {
-  return StackPage(
-    title: screenTitle,
-    subtitle: 'playlistId=${_param(AppRouteParam.playlistId)}',
-  );
-}

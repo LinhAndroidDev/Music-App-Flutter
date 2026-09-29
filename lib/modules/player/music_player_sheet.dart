@@ -71,8 +71,8 @@ class _MusicPlayerSheetState extends State<MusicPlayerSheet> {
   Widget build(BuildContext context) {
     // Player lives in GetMaterialApp.builder (sibling of app Navigator) — nested
     // Navigator so modal sheets/dialogs from the player menu work and stack on top.
-    return HeroMode(
-      enabled: false,
+    // Sibling of GetX Navigator in [AppPlayerShell] — must not share MaterialApp HeroController.
+    return HeroControllerScope.none(
       child: Navigator(
         onGenerateRoute: (settings) {
           return MaterialPageRoute<void>(

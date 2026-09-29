@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../../core/base/base_controller.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/navigation/app_route.dart';
+import '../../../core/widgets/app_toast.dart';
 import '../../../data/models/firestore_song.dart';
 import '../../../data/models/song.dart';
 import '../../../data/services/auth_repository.dart';
@@ -81,7 +82,7 @@ class SingerDetailController extends BaseController {
 
     if (_auth.currentUser.value == null) {
       if (l10n != null) {
-        Get.snackbar('', l10n.artist_login_message, snackPosition: SnackPosition.BOTTOM);
+        showAppToast(l10n.artist_login_message, category: AppToastCategory.artist);
       }
       return;
     }
@@ -94,15 +95,14 @@ class SingerDetailController extends BaseController {
     if (l10n == null) return;
     switch (result) {
       case FollowMutationResult.success:
-        Get.snackbar(
-          '',
+        showAppToast(
           followed ? l10n.artist_followed_toast : l10n.artist_unfollowed_toast,
-          snackPosition: SnackPosition.BOTTOM,
+          category: AppToastCategory.artist,
         );
       case FollowMutationResult.requiresLogin:
-        Get.snackbar('', l10n.artist_login_message, snackPosition: SnackPosition.BOTTOM);
+        showAppToast(l10n.artist_login_message, category: AppToastCategory.artist);
       case FollowMutationResult.failure:
-        Get.snackbar('', l10n.artist_operation_failed, snackPosition: SnackPosition.BOTTOM);
+        showAppToast(l10n.artist_operation_failed, category: AppToastCategory.artist);
     }
   }
 
@@ -111,7 +111,7 @@ class SingerDetailController extends BaseController {
     final list = songs.toList();
     if (list.isEmpty) {
       if (l10n != null) {
-        Get.snackbar('', l10n.artist_play_empty, snackPosition: SnackPosition.BOTTOM);
+        showAppToast(l10n.artist_play_empty, category: AppToastCategory.artist);
       }
       return;
     }

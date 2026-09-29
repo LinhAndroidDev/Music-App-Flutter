@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '../../core/base/base_controller.dart';
 import '../../core/l10n/l10n.dart';
+import '../../core/widgets/app_toast.dart';
 import '../../data/models/song.dart';
 import '../../data/models/song_arrangement.dart';
 import '../../data/playback/playback_preferences.dart';
@@ -66,11 +67,11 @@ class FavouriteSongController extends BaseController {
     final l10n = Get.context?.l10n;
     final result = await _favourites.removeFavourite(song.id);
     if (result == FavouriteMutationResult.success && l10n != null) {
-      Get.snackbar('', l10n.toast_removed_favourite, snackPosition: SnackPosition.BOTTOM);
+      showAppToast(l10n.toast_removed_favourite, category: AppToastCategory.favourite);
     } else if (result == FavouriteMutationResult.requiresLogin && l10n != null) {
-      Get.snackbar('', l10n.favourite_login_required, snackPosition: SnackPosition.BOTTOM);
+      showAppToast(l10n.favourite_login_required, category: AppToastCategory.favourite);
     } else if (l10n != null) {
-      Get.snackbar('', l10n.favourite_operation_failed, snackPosition: SnackPosition.BOTTOM);
+      showAppToast(l10n.favourite_operation_failed, category: AppToastCategory.favourite);
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 import '../../../core/navigation/app_navigate.dart';
+import '../../../core/widgets/app_toast.dart';
 import '../../../core/playback/playback_controller.dart';
 import '../../../data/models/song.dart';
 
@@ -12,13 +13,13 @@ Future<void> playVisibleSongList(List<Song> songs, String songId) async {
     final ok = await playback.playFromVisibleList(songs, songId);
     if (!ok) {
       AppNavigate.closePlayer();
-      Get.snackbar('', 'Không thể phát bài hát này', snackPosition: SnackPosition.BOTTOM);
+      showAppToast('Không thể phát bài hát này', category: AppToastCategory.playback);
     }
   } on StateError catch (e) {
     AppNavigate.closePlayer();
-    Get.snackbar('', e.message, snackPosition: SnackPosition.BOTTOM);
+    showAppToast(e.message, category: AppToastCategory.playback);
   } catch (_) {
     AppNavigate.closePlayer();
-    Get.snackbar('', 'Không thể phát bài hát này', snackPosition: SnackPosition.BOTTOM);
+    showAppToast('Không thể phát bài hát này', category: AppToastCategory.playback);
   }
 }
