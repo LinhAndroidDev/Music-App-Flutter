@@ -11,6 +11,7 @@ import '../main/main_controller.dart';
 import 'music_player_coordinator.dart';
 import 'music_player_sheet.dart';
 import 'widgets/mini_player_bar.dart';
+import 'widgets/player_sheet_overlay.dart';
 
 /// Global full player + mini player above all GetX routes (ServiceMusic MainActivity).
 class AppPlayerShell extends StatefulWidget {
@@ -127,8 +128,12 @@ class _AppPlayerShellState extends State<AppPlayerShell> {
             ),
           ),
         ),
-        if (fullPlayerOpen)
-          const Positioned.fill(child: MusicPlayerSheet()),
+        Positioned.fill(
+          child: PlayerSheetOverlay(
+            isOpen: fullPlayerOpen,
+            child: const MusicPlayerSheet(),
+          ),
+        ),
         if (showMiniBar)
           Positioned(
             left: 0,

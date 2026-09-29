@@ -75,9 +75,13 @@ class _MusicPlayerSheetState extends State<MusicPlayerSheet> {
     return HeroControllerScope.none(
       child: Navigator(
         onGenerateRoute: (settings) {
-          return MaterialPageRoute<void>(
+          return PageRouteBuilder<void>(
             settings: settings,
-            builder: (routeContext) => _buildPlayer(routeContext),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+            pageBuilder: (routeContext, animation, secondaryAnimation) {
+              return _buildPlayer(routeContext);
+            },
           );
         },
       ),

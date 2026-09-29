@@ -139,13 +139,16 @@ class _MiniPlayerBarState extends State<MiniPlayerBar> {
           ? (state.positionMs / state.durationMs).clamp(0.0, 1.0)
           : 0.0;
 
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(_outerMarginH, 0, _outerMarginH, _outerMarginBottom),
-        child: SizedBox(
-          height: _contentHeight,
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
+      return GestureDetector(
+        onTap: _openFullPlayer,
+        behavior: HitTestBehavior.translucent,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(_outerMarginH, 0, _outerMarginH, _outerMarginBottom),
+          child: SizedBox(
+            height: _contentHeight,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
               Positioned(
                 left: 0,
                 right: 0,
@@ -168,11 +171,7 @@ class _MiniPlayerBarState extends State<MiniPlayerBar> {
                                 const SizedBox(width: 70),
                                 Expanded(
                                   child: playlist.isEmpty || _pageController == null
-                                      ? GestureDetector(
-                                          onTap: _openFullPlayer,
-                                          behavior: HitTestBehavior.opaque,
-                                          child: _songInfoPage(song),
-                                        )
+                                      ? _songInfoPage(song)
                                       : PageView.builder(
                                           controller: _pageController,
                                           itemCount: playlist.length,
@@ -181,11 +180,7 @@ class _MiniPlayerBarState extends State<MiniPlayerBar> {
                                             i,
                                             state.queueIndex,
                                           ),
-                                          itemBuilder: (_, i) => GestureDetector(
-                                            onTap: _openFullPlayer,
-                                            behavior: HitTestBehavior.opaque,
-                                            child: _songInfoPage(playlist[i]),
-                                          ),
+                                          itemBuilder: (_, i) => _songInfoPage(playlist[i]),
                                         ),
                                 ),
                                 const SizedBox(width: 5),
@@ -259,7 +254,8 @@ class _MiniPlayerBarState extends State<MiniPlayerBar> {
                   ),
                 ),
               ),
-            ],
+              ],
+            ),
           ),
         ),
       );
