@@ -102,21 +102,29 @@ class PlaybackController extends GetxController {
     _queueRepo.syncCachesFromCatalog();
   }
 
+  Future<void> _ensurePlaybackEngineReady() async {
+    if (MusicPlaybackService.isReady) {
+      _bindHandlerStreams();
+      return;
+    }
+    await ensureReady();
+  }
+
   Future<bool> playFromVisibleList(List<Song> songs, String songId) async {
     if (songId.isEmpty || songs.isEmpty) return false;
-    await ensureReady();
+    await _ensurePlaybackEngineReady();
     unawaited(ensureNotificationPermission());
     return handler.playFromVisibleList(songs, songId);
   }
 
   Future<bool> playSong(Song song) async {
-    await ensureReady();
+    await _ensurePlaybackEngineReady();
     unawaited(ensureNotificationPermission());
     return handler.playSong(song);
   }
 
   Future<bool> playSongAtIndex(int index) async {
-    await ensureReady();
+    await _ensurePlaybackEngineReady();
     unawaited(ensureNotificationPermission());
     return handler.playSongAtIndex(index);
   }

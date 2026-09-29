@@ -115,29 +115,19 @@ abstract final class AppNavigate {
     String? songId,
     bool preservePlayback = false,
   }) {
-    // Avoid nested navigation / Obx rebuild while Navigator is locked (e.g. mini player tap mid-transition).
+    if (preservePlayback) {
+      presentPlayerUi();
+      return Get.find<PlaybackController>().ensureReady();
+    }
+
     if (_openPlayerFuture != null) {
       return _openPlayerFuture!;
     }
-    if (preservePlayback) {
-      final future = _openPlayerFuture = _openPlayerForExistingPlayback().then((_) {
-        SchedulerBinding.instance.addPostFrameCallback((_) {
-          presentPlayerUi();
-        });
-      }).whenComplete(() => _openPlayerFuture = null);
-      return future;
-    }
 
     final future = _openPlayerFuture = _openPlayerImpl(songId: songId).then((_) {
-      SchedulerBinding.instance.addPostFrameCallback((_) {
-        presentPlayerUi();
-      });
+      presentPlayerUi();
     }).whenComplete(() => _openPlayerFuture = null);
     return future;
-  }
-
-  static Future<void> _openPlayerForExistingPlayback() async {
-    await Get.find<PlaybackController>().ensureReady();
   }
 
   static Future<void> _openPlayerImpl({String? songId}) async {

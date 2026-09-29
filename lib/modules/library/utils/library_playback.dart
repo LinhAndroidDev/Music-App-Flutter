@@ -14,7 +14,6 @@ Future<void> playVisibleSongList(List<Song> songs, String songId) async {
       showAppToast('Không thể phát bài hát này', category: AppToastCategory.playback);
       return;
     }
-    // ServiceMusic: playFromVisibleList then MusicPlayerLauncher.open (UI after queue + state).
     AppNavigate.presentPlayerUi();
   } on StateError catch (e) {
     AppNavigate.closePlayer();

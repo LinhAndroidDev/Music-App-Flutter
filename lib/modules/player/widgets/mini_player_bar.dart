@@ -93,9 +93,7 @@ class _MiniPlayerBarState extends State<MiniPlayerBar> {
   }
 
   void _openFullPlayer() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      AppNavigate.openPlayer(preservePlayback: true);
-    });
+    AppNavigate.openPlayer(preservePlayback: true);
   }
 
   void _onMiniPlayerPageChanged(PlaybackController playback, int index, int queueIndex) {
