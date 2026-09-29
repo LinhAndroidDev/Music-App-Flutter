@@ -8,13 +8,14 @@ import '../../../data/models/song.dart';
 Future<void> playVisibleSongList(List<Song> songs, String songId) async {
   if (songs.isEmpty || songId.isEmpty) return;
   try {
-    AppNavigate.presentPlayerUi();
     final playback = Get.find<PlaybackController>();
     final ok = await playback.playFromVisibleList(songs, songId);
     if (!ok) {
-      AppNavigate.closePlayer();
       showAppToast('Không thể phát bài hát này', category: AppToastCategory.playback);
+      return;
     }
+    // ServiceMusic: playFromVisibleList then MusicPlayerLauncher.open (UI after queue + state).
+    AppNavigate.presentPlayerUi();
   } on StateError catch (e) {
     AppNavigate.closePlayer();
     showAppToast(e.message, category: AppToastCategory.playback);

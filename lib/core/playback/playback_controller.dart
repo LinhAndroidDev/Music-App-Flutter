@@ -105,21 +105,20 @@ class PlaybackController extends GetxController {
   Future<bool> playFromVisibleList(List<Song> songs, String songId) async {
     if (songId.isEmpty || songs.isEmpty) return false;
     await ensureReady();
-    await ensureNotificationPermission();
-    await handler.playFromVisibleList(songs, songId);
-    return true;
+    unawaited(ensureNotificationPermission());
+    return handler.playFromVisibleList(songs, songId);
   }
 
-  Future<void> playSong(Song song) async {
+  Future<bool> playSong(Song song) async {
     await ensureReady();
-    await ensureNotificationPermission();
-    await handler.playSong(song);
+    unawaited(ensureNotificationPermission());
+    return handler.playSong(song);
   }
 
-  Future<void> playSongAtIndex(int index) async {
+  Future<bool> playSongAtIndex(int index) async {
     await ensureReady();
-    await ensureNotificationPermission();
-    await handler.playSongAtIndex(index);
+    unawaited(ensureNotificationPermission());
+    return handler.playSongAtIndex(index);
   }
 
   Future<void> playPause() async {

@@ -119,34 +119,42 @@ abstract final class AppNavigate {
     if (_openPlayerFuture != null) {
       return _openPlayerFuture!;
     }
-    final completer = _openPlayerFuture = _openPlayerImpl(
-      songId: songId,
-      preservePlayback: preservePlayback,
-    ).whenComplete(() => _openPlayerFuture = null);
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      presentPlayerUi();
-    });
-    return completer;
+    if (preservePlayback) {
+      final future = _openPlayerFuture = _openPlayerForExistingPlayback().then((_) {
+        SchedulerBinding.instance.addPostFrameCallback((_) {
+          presentPlayerUi();
+        });
+      }).whenComplete(() => _openPlayerFuture = null);
+      return future;
+    }
+
+    final future = _openPlayerFuture = _openPlayerImpl(songId: songId).then((_) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        presentPlayerUi();
+      });
+    }).whenComplete(() => _openPlayerFuture = null);
+    return future;
   }
 
-  static Future<void> _openPlayerImpl({
-    String? songId,
-    bool preservePlayback = false,
-  }) async {
+  static Future<void> _openPlayerForExistingPlayback() async {
+    await Get.find<PlaybackController>().ensureReady();
+  }
+
+  static Future<void> _openPlayerImpl({String? songId}) async {
     final playback = Get.find<PlaybackController>();
     await playback.ensureReady();
 
-    if (!preservePlayback && songId != null && songId.isNotEmpty) {
-      final queue = Get.find<SongPlaybackRepository>();
-      final index = queue.ensureQueueForSongId(songId);
-      if (index >= 0) {
-        await playback.playSongAtIndex(index);
-      } else {
-        final song = queue.getSongById(songId);
-        if (song != null) {
-          await playback.playSong(song);
-        }
-      }
+    if (songId == null || songId.isEmpty) return;
+
+    final queue = Get.find<SongPlaybackRepository>();
+    final index = queue.ensureQueueForSongId(songId);
+    if (index >= 0) {
+      await playback.playSongAtIndex(index);
+      return;
+    }
+    final song = queue.getSongById(songId);
+    if (song != null) {
+      await playback.playSong(song);
     }
   }
 

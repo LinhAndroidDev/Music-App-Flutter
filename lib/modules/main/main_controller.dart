@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
@@ -27,6 +29,10 @@ class MainController extends BaseController implements MainTabController {
       ever(auth.currentUser, (user) {
         profilePhotoUrl.value = user?.photoUrl;
       });
+    }
+
+    if (Get.isRegistered<PlaybackController>()) {
+      unawaited(Get.find<PlaybackController>().ensureReady());
     }
 
     SchedulerBinding.instance.addPostFrameCallback((_) {

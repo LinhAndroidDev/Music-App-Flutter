@@ -127,8 +127,28 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
     }
   }
 
-  Future<void> playSong(Song song, {int? queueIndex, int startPositionMs = 0}) async {
-    if (song.id.isEmpty) return;
+  /// Publishes [currentSong] before streaming (ServiceMusic [playSongInternal]).
+  void _emitOptimisticSong(Song song, int index, int startPositionMs) {
+    final estimatedMs =
+        song.durationSec > 0 ? song.durationSec * 1000 : _uiState.durationMs;
+    _resetPositionUiThrottle();
+    _emitUi(
+      _uiState.copyWith(
+        currentSong: song,
+        queueIndex: index,
+        hasActivePlayer: true,
+        isPlaying: false,
+        isShuffleEnabled: _queueRepo.isShuffleEnabled(),
+        positionMs: startPositionMs,
+        durationMs: estimatedMs,
+      ),
+      forcePublish: true,
+    );
+    unawaited(_publishMedia(song));
+  }
+
+  Future<bool> playSong(Song song, {int? queueIndex, int startPositionMs = 0}) async {
+    if (song.id.isEmpty) return false;
     var index = queueIndex;
     if (index == null || index < 0) {
       index = _queueRepo.indexOf(song);
@@ -141,23 +161,25 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
       index = 0;
     }
     _queueIndex = index;
-    await _startStreaming(song, startPositionMs, autoStart: true);
+    _emitOptimisticSong(song, index, startPositionMs);
+    unawaited(_startStreaming(song, startPositionMs, autoStart: true));
+    return true;
   }
 
-  Future<void> playSongAtIndex(int index) async {
-    if (!_queueRepo.isLoaded()) return;
+  Future<bool> playSongAtIndex(int index) async {
+    if (!_queueRepo.isLoaded()) return false;
     final last = _queueRepo.lastIndex();
-    if (last < 0) return;
+    if (last < 0) return false;
     final safe = index.clamp(0, last);
     _queueIndex = safe;
-    await playSong(_queueRepo.getSong(safe), queueIndex: safe);
+    return playSong(_queueRepo.getSong(safe), queueIndex: safe);
   }
 
-  Future<void> playFromVisibleList(List<Song> songs, String songId) async {
+  Future<bool> playFromVisibleList(List<Song> songs, String songId) async {
     final index = songs.indexWhere((s) => s.id == songId);
-    if (index < 0) return;
+    if (index < 0) return false;
     _queueRepo.setPlaybackQueue(songs);
-    await playSong(songs[index], queueIndex: index);
+    return playSong(songs[index], queueIndex: index);
   }
 
   Future<void> _startStreaming(
@@ -167,7 +189,14 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
   }) async {
     final uri = await _uriResolver.resolve(song);
     if (uri == null) {
-      _emitUi(_uiState.copyWith(isPlaying: false, hasActivePlayer: false));
+      _emitUi(
+        _uiState.copyWith(
+          isPlaying: false,
+          hasActivePlayer: false,
+          clearSong: true,
+        ),
+        forcePublish: true,
+      );
       return;
     }
 
@@ -187,25 +216,19 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
         await _player.seek(Duration(milliseconds: startPositionMs));
       }
       _historyRecordedForSongId = null;
-      await _publishMedia(song);
-      _resetPositionUiThrottle();
-      _emitUi(
-        _uiState.copyWith(
-          currentSong: song,
-          queueIndex: _queueIndex,
-          hasActivePlayer: true,
-          isShuffleEnabled: _queueRepo.isShuffleEnabled(),
-          positionMs: startPositionMs,
-          durationMs: song.durationSec > 0 ? song.durationSec * 1000 : _uiState.durationMs,
-        ),
-        forcePublish: true,
-      );
       if (autoStart) {
         await _player.play();
       }
       await _recordRecentOnce(song);
     } catch (_) {
-      _emitUi(_uiState.copyWith(isPlaying: false));
+      _emitUi(
+        _uiState.copyWith(
+          isPlaying: false,
+          hasActivePlayer: false,
+          clearSong: true,
+        ),
+        forcePublish: true,
+      );
     }
   }
 
