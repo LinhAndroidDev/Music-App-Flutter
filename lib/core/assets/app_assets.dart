@@ -43,6 +43,7 @@ abstract final class AppAssets {
   static const icHeadphone = '$icons/ic_headphone.svg';
   static const icMicro = '$icons/ic_micro.svg';
   static const icMicroFill = '$icons/ic_micro_fill.svg';
+  static const icPlayVideo = '$icons/ic_play_video.svg';
   static const icWifiOff = '$icons/ic_wifi_off.svg';
   static const icWifiConnected = '$icons/ic_wifi_connected.svg';
 

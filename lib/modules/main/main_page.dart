@@ -7,6 +7,7 @@ import '../../core/theme/app_colors.dart';
 import '../discover/discover_page.dart';
 import '../library/library_page.dart';
 import '../profile/profile_page.dart';
+import '../zing_chart/zing_chart_page.dart';
 import 'main_controller.dart';
 
 class MainPage extends GetView<MainController> {
@@ -22,7 +23,7 @@ class MainPage extends GetView<MainController> {
           children: const [
             LibraryPage(),
             DiscoverPage(),
-            _TabPlaceholder(tab: AppTab.zingChart),
+            ZingChartPage(),
             _TabPlaceholder(tab: AppTab.radio),
             ProfilePage(),
           ],

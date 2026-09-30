@@ -43,6 +43,10 @@ class HomeCatalogService extends GetxService {
     ]);
   }
 
+  Future<void> refreshTop() async {
+    await _loadTop(force: true);
+  }
+
   Future<List<HomeTopic>> buildTopics({
     required String newChartTitle,
     required String top100Title,
