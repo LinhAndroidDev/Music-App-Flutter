@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import 'app/app_pages.dart';
 import 'app/initial_binding.dart';
+import 'core/network/configure_dev_http_overrides.dart';
 import 'core/l10n/l10n.dart';
 import 'core/theme/app_theme.dart';
 import 'firebase_options.dart';
@@ -13,6 +14,7 @@ import 'modules/player/app_player_shell.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  configureDevHttpOverrides();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

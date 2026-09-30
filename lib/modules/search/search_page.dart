@@ -8,9 +8,11 @@ import '../../core/navigation/app_navigation_route.dart';
 import '../../core/playback/playback_controller.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_icon.dart';
+import '../../core/widgets/chrome_top_shadow.dart';
 import '../../data/models/song.dart';
 import '../library/utils/library_playback.dart';
 import '../player/app_player_shell.dart';
+import '../player/music_player_coordinator.dart';
 import '../player/show_song_options.dart';
 import 'search_controller.dart';
 import 'widgets/search_chip_section.dart';
@@ -27,10 +29,16 @@ class SearchPage extends GetView<MusicSearchController> {
     final l10n = context.l10n;
     return Scaffold(
       backgroundColor: AppColors.white,
+      // Keep full-height layout so the mic FAB tracks IME like ServiceMusic translationY.
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         bottom: false,
-        child: Stack(
-          children: [
+        child: MediaQuery.removePadding(
+          context: context,
+          removeBottom: true,
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -38,9 +46,9 @@ class SearchPage extends GetView<MusicSearchController> {
                   padding: const EdgeInsets.fromLTRB(0, 8, 15, 10),
                   child: Row(
                     children: [
-                      InkWell(
+                      const InkWell(
                         onTap: AppNavigate.back,
-                        child: const Padding(
+                        child: Padding(
                           padding: EdgeInsets.symmetric(horizontal: 15),
                           child: AppIcon(AppAssets.icBackThin, size: 25, color: AppColors.black),
                         ),
@@ -109,30 +117,28 @@ class SearchPage extends GetView<MusicSearchController> {
             ),
             Obx(() {
               Get.find<PlaybackController>().playbackState.value;
+              Get.find<AppNavigationRoute>().currentRoute.value;
               Get.find<AppNavigationRoute>().modalRouteCount.value;
-              final clearance = _microFabClearance(context);
+              MediaQuery.viewInsetsOf(context).bottom;
+              final bottom = _microFabBottom(context);
               return Positioned(
-                right: 16,
-                bottom: clearance,
-                child: Material(
-                  color: AppColors.purple1,
-                  shape: const CircleBorder(),
-                  elevation: 4,
-                  child: InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: () => VoiceSearchDialog.show(
-                      context,
-                      onResult: controller.setQueryFromVoice,
-                    ),
-                    child: const Padding(
-                      padding: EdgeInsets.all(14),
-                      child: AppIcon(AppAssets.icMicro, size: 24, color: AppColors.white),
-                    ),
+                right: 15,
+                bottom: bottom,
+                child: VoiceSearchFab(
+                  onTap: () => VoiceSearchDialog.show(
+                    context,
+                    onResult: controller.setQueryFromVoice,
+                  ),
+                  icon: const AppIcon(
+                    AppAssets.icMicroFill,
+                    size: 35,
+                    color: AppColors.blue,
                   ),
                 ),
               );
             }),
           ],
+          ),
         ),
       ),
     );
@@ -143,25 +149,33 @@ class SearchPage extends GetView<MusicSearchController> {
   }
 
   double _listBottomPadding(BuildContext context) {
-    final nav = Get.find<AppNavigationRoute>();
-    final playback = Get.find<PlaybackController>();
-    final showBottomBar = nav.showsAppChrome;
-    final state = playback.playbackState.value;
-    final showMiniBar = showBottomBar &&
-        state.hasActivePlayer &&
-        state.currentSong != null;
-    return AppPlayerShell.bottomContentInset(
-          context,
-          showBottomBar: showBottomBar,
-          showMiniBar: showMiniBar,
-        ) +
-        8;
+    return _chromeOverlayHeight(context) + 8;
   }
 
-  double _microFabClearance(BuildContext context) {
-    const extra = 8.0;
+  /// Offset from physical bottom (see [MediaQuery.removePadding] on search [Stack]).
+  double _microFabBottom(BuildContext context) {
+    const gapAboveChrome = 12.0;
     final ime = MediaQuery.viewInsetsOf(context).bottom;
-    final chrome = _listBottomPadding(context) - 8;
-    return extra + (ime > chrome ? ime : chrome);
+    if (ime > 0) {
+      return gapAboveChrome + ime;
+    }
+    return gapAboveChrome + _chromeOverlayHeight(context);
+  }
+
+  double _chromeOverlayHeight(BuildContext context) {
+    final nav = Get.find<AppNavigationRoute>();
+    final playback = Get.find<PlaybackController>();
+    final coordinator = Get.find<MusicPlayerCoordinator>();
+    if (!nav.showsAppChrome || coordinator.isOpen.value) {
+      return 0;
+    }
+    final state = playback.playbackState.value;
+    final showMiniBar =
+        state.hasActivePlayer && state.currentSong != null;
+    return AppPlayerShell.bottomContentInset(
+      context,
+      showBottomBar: true,
+      showMiniBar: showMiniBar,
+    );
   }
 }

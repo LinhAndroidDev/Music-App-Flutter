@@ -4,7 +4,10 @@ import 'package:speech_to_text/speech_to_text.dart';
 
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_icon.dart';
 import '../../../core/widgets/app_toast.dart';
+import '../../../core/widgets/service_music_dialog.dart';
+import '../../../core/assets/app_assets.dart';
 
 class VoiceSearchDialog extends StatefulWidget {
   const VoiceSearchDialog({super.key, required this.onResult});
@@ -15,14 +18,9 @@ class VoiceSearchDialog extends StatefulWidget {
     BuildContext context, {
     required ValueChanged<String> onResult,
   }) {
-    return showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (ctx) => VoiceSearchDialog(onResult: onResult),
+    return ServiceMusicDialog.show<void>(
+      context,
+      child: VoiceSearchDialog(onResult: onResult),
     );
   }
 
@@ -116,39 +114,24 @@ class _VoiceSearchDialogState extends State<VoiceSearchDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + MediaQuery.paddingOf(context).bottom),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            l10n.voice_search_title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textBlack,
-            ),
-          ),
-          const SizedBox(height: 24),
-          if (_listening)
-            const SizedBox(
-              width: 48,
-              height: 48,
-              child: CircularProgressIndicator(strokeWidth: 3),
-            ),
-          const SizedBox(height: 16),
-          Text(
-            _status.isEmpty ? l10n.voice_search_listening : _status,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14, color: AppColors.txtHint),
-          ),
-          const SizedBox(height: 24),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text(l10n.voice_search_cancel),
-          ),
-        ],
-      ),
+    final statusText = _status.isEmpty ? l10n.voice_search_listening : _status;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ServiceMusicDialogTitle(l10n.voice_search_title),
+        if (_listening)
+          const Padding(
+            padding: EdgeInsets.only(top: 20),
+            child: AppIcon(AppAssets.icMicroFill, size: 56, color: AppColors.blue),
+          )
+        else
+          const SizedBox(height: 20),
+        ServiceMusicDialogMessage(statusText),
+        ServiceMusicDialogCancelButton(
+          label: l10n.voice_search_cancel,
+          onTap: () => Navigator.of(context).pop(),
+        ),
+      ],
     );
   }
 }

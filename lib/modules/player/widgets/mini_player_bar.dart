@@ -8,6 +8,7 @@ import '../../../core/navigation/app_navigation_route.dart';
 import '../../../core/playback/playback_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_icon.dart';
+import '../../../core/widgets/chrome_top_shadow.dart';
 import '../../../data/models/song.dart';
 import '../music_player_coordinator.dart';
 import '../player_controller.dart';
@@ -141,120 +142,114 @@ class _MiniPlayerBarState extends State<MiniPlayerBar> {
         onTap: _openFullPlayer,
         behavior: HitTestBehavior.translucent,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(_outerMarginH, 0, _outerMarginH, _outerMarginBottom),
-          child: SizedBox(
-            height: _contentHeight,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-              Positioned(
-                left: 0,
-                right: 0,
-                top: _cardTopInset,
-                child: Material(
-                  color: AppColors.white,
-                  elevation: 8,
-                  shadowColor: Colors.black26,
-                  borderRadius: BorderRadius.circular(10),
-                  clipBehavior: Clip.antiAlias,
-                  child: SizedBox(
-                    height: _cardBodyHeight,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 5),
-                            child: Row(
-                              children: [
-                                const SizedBox(width: 70),
-                                Expanded(
-                                  child: playlist.isEmpty || _pageController == null
-                                      ? _songInfoPage(song)
-                                      : PageView.builder(
-                                          controller: _pageController,
-                                          itemCount: playlist.length,
-                                          onPageChanged: (i) => _onMiniPlayerPageChanged(
-                                            playback,
-                                            i,
-                                            state.queueIndex,
-                                          ),
-                                          itemBuilder: (_, i) => _songInfoPage(playlist[i]),
-                                        ),
-                                ),
-                                const SizedBox(width: 5),
-                                InkWell(
-                                  onTap: () => player.toggleFavourite(),
-                                  customBorder: const CircleBorder(),
-                                  child: AppIcon(
-                                    isFavourite ? AppAssets.icFavouriteFill : AppAssets.icFavouriteThin,
-                                    size: 28,
-                                    color: isFavourite ? AppColors.bgPink : AppColors.textBlack,
-                                  ),
-                                ),
-                                const SizedBox(width: 15),
-                                InkWell(
-                                  onTap: () => playback.playPause(),
-                                  customBorder: const CircleBorder(),
-                                  child: AppIcon(
-                                    state.isPlaying ? AppAssets.pause : AppAssets.play,
-                                    size: 30,
-                                    color: AppColors.textBlack,
-                                  ),
-                                ),
-                                const SizedBox(width: 15),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 10),
-                                  child: InkWell(
-                                    onTap: () => playback.dismissMiniPlayer(),
-                                    customBorder: const CircleBorder(),
-                                    child: const AppIcon(
-                                      AppAssets.icClose,
-                                      size: 25,
-                                      color: AppColors.textBlack,
+              padding: const EdgeInsets.fromLTRB(_outerMarginH, 0, _outerMarginH, _outerMarginBottom),
+              child: SizedBox(
+                height: _contentHeight,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      top: _cardTopInset,
+                      child: ChromeRoundedCardShadow(
+                        height: _cardBodyHeight,
+                        borderRadius: 10,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 5),
+                                child: Row(
+                                  children: [
+                                    const SizedBox(width: 70),
+                                    Expanded(
+                                      child: playlist.isEmpty || _pageController == null
+                                          ? _songInfoPage(song)
+                                          : PageView.builder(
+                                              controller: _pageController,
+                                              itemCount: playlist.length,
+                                              onPageChanged: (i) => _onMiniPlayerPageChanged(
+                                                playback,
+                                                i,
+                                                state.queueIndex,
+                                              ),
+                                              itemBuilder: (_, i) => _songInfoPage(playlist[i]),
+                                            ),
                                     ),
-                                  ),
+                                    const SizedBox(width: 5),
+                                    InkWell(
+                                      onTap: () => player.toggleFavourite(),
+                                      customBorder: const CircleBorder(),
+                                      child: AppIcon(
+                                        isFavourite ? AppAssets.icFavouriteFill : AppAssets.icFavouriteThin,
+                                        size: 28,
+                                        color: isFavourite ? AppColors.bgPink : AppColors.textBlack,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 15),
+                                    InkWell(
+                                      onTap: () => playback.playPause(),
+                                      customBorder: const CircleBorder(),
+                                      child: AppIcon(
+                                        state.isPlaying ? AppAssets.pause : AppAssets.play,
+                                        size: 30,
+                                        color: AppColors.textBlack,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 15),
+                                    Padding(
+                                      padding: const EdgeInsets.only(right: 10),
+                                      child: InkWell(
+                                        onTap: () => playback.dismissMiniPlayer(),
+                                        customBorder: const CircleBorder(),
+                                        child: const AppIcon(
+                                          AppAssets.icClose,
+                                          size: 25,
+                                          color: AppColors.textBlack,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
-                          ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                              child: LinearProgressIndicator(
+                                value: progress,
+                                minHeight: 2,
+                                backgroundColor: AppColors.greyLight,
+                                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.bgPurple),
+                              ),
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: LinearProgressIndicator(
-                            value: progress,
-                            minHeight: 2,
-                            backgroundColor: AppColors.greyLight,
-                            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.bgPurple),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                    Positioned(
+                      left: 10,
+                      top: 0,
+                      child: Material(
+                        elevation: 8,
+                        shadowColor: Colors.black26,
+                        borderRadius: BorderRadius.circular(8),
+                        clipBehavior: Clip.antiAlias,
+                        child: SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: song.thumbnailUrl.isNotEmpty
+                              ? CachedNetworkImage(
+                                  imageUrl: song.thumbnailUrl,
+                                  fit: BoxFit.cover,
+                                )
+                              : Container(color: AppColors.purpleDark1),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Positioned(
-                left: 10,
-                top: 0,
-                child: Material(
-                  elevation: 8,
-                  shadowColor: Colors.black26,
-                  borderRadius: BorderRadius.circular(8),
-                  clipBehavior: Clip.antiAlias,
-                  child: SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: song.thumbnailUrl.isNotEmpty
-                        ? CachedNetworkImage(
-                            imageUrl: song.thumbnailUrl,
-                            fit: BoxFit.cover,
-                          )
-                        : Container(color: AppColors.purpleDark1),
-                  ),
-                ),
-              ),
-              ],
-            ),
-          ),
         ),
       );
     });
