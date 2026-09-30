@@ -41,6 +41,19 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.221870413468-s6ka9vu9el944elv1ib7i9om0921aboj</string>
+			</array>
+		</dict>
+	</array>
+	<key>GIDClientID</key>
+	<string>221870413468-s6ka9vu9el944elv1ib7i9om0921aboj.apps.googleusercontent.com</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Cần quyền micro để tìm kiếm bằng giọng nói</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
