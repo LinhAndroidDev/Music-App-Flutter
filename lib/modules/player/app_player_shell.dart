@@ -95,12 +95,9 @@ class _AppPlayerShellState extends State<AppPlayerShell> {
           Positioned.fill(
             child: MediaQuery(
               data: childMediaQuery,
-              child: HeroMode(
-                enabled: false,
-                child: ColoredBox(
-                  color: AppColors.background,
-                  child: widget.child ?? const SizedBox.shrink(),
-                ),
+              child: ColoredBox(
+                color: AppColors.background,
+                child: widget.child ?? const SizedBox.shrink(),
               ),
             ),
           ),

@@ -1,21 +1,17 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../core/assets/app_assets.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_icon.dart';
 import '../../library/widgets/library_song_row.dart';
+import '../../player/app_player_shell.dart';
 import '../../player/show_song_options.dart';
 import 'singer_detail_controller.dart';
 import 'widgets/singer_description_section.dart';
-import 'widgets/singer_follow_play_buttons.dart';
+import 'widgets/singer_resizable_header_scroll.dart';
 
 class SingerDetailPage extends GetView<SingerDetailController> {
   const SingerDetailPage({super.key});
-
-  static const _avatarSize = 140.0;
 
   @override
   Widget build(BuildContext context) {
@@ -23,102 +19,69 @@ class SingerDetailPage extends GetView<SingerDetailController> {
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
+        bottom: false,
         child: Obx(() {
-          if (controller.isLoading.value) {
+          final loading = controller.isLoading.value;
+          final s = controller.singer.value;
+          final songs = controller.songs;
+          final hasPreview = controller.initialName.isNotEmpty ||
+              controller.initialAvatarUrl.isNotEmpty;
+
+          if (loading && s == null && !hasPreview) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final s = controller.singer.value;
-          final songs = controller.songs;
-          final name = s?.name ?? l10n.singer_info_empty;
+          final name = controller.displayName(l10n);
+          final avatarUrl = controller.displayAvatarUrl();
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.only(bottom: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: InkWell(
-                      onTap: Get.back,
-                      child: const AppIcon(
-                        AppAssets.icBackThin,
-                        size: 25,
-                        color: AppColors.black,
-                      ),
-                    ),
-                  ),
+          return SingerResizableHeaderScroll(
+            singerId: controller.singerId,
+            onBack: Get.back,
+            avatarUrl: avatarUrl,
+            name: name,
+            songCountText: l10n.singer_detail_songs_count(songs.length),
+            isFollowed: controller.isFollowed.value,
+            onFollow: controller.toggleFollow,
+            onPlay: controller.playAll,
+            buttonsEnabled: s != null && !controller.loadError.value,
+            slivers: [
+              if (s != null && s.description.isNotEmpty)
+                SliverToBoxAdapter(
+                  child: SingerDescriptionSection(description: s.description),
                 ),
-                const SizedBox(height: 16),
-                Center(
-                  child: ClipOval(
-                    child: SizedBox(
-                      width: _avatarSize,
-                      height: _avatarSize,
-                      child: s != null && s.avatarUrl.isNotEmpty
-                          ? CachedNetworkImage(imageUrl: s.avatarUrl, fit: BoxFit.cover)
-                          : Container(color: AppColors.greyLight),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    name,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textBlack,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.singer_detail_songs_count(songs.length),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 12, color: AppColors.txtHint),
-                ),
-                const SizedBox(height: 16),
-                Obx(
-                  () => SingerFollowPlayButtons(
-                    isFollowed: controller.isFollowed.value,
-                    enabled: s != null && !controller.loadError.value,
-                    onFollow: controller.toggleFollow,
-                    onPlay: controller.playAll,
-                  ),
-                ),
-                if (s != null && s.description.isNotEmpty)
-                  SingerDescriptionSection(description: s.description),
-                if (songs.isEmpty)
-                  Padding(
+              if (songs.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Padding(
                     padding: const EdgeInsets.only(top: 40),
                     child: Text(
                       l10n.singer_detail_songs_empty,
                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 14, color: AppColors.txtHint),
                     ),
-                  )
-                else
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 20, 10, 0),
-                    child: Column(
-                      children: songs
-                          .map(
-                            (song) => LibrarySongRow(
-                              song: song,
-                              onTap: () => controller.playSong(song),
-                              onMore: () => showSongOptions(context, song),
-                            ),
-                          )
-                          .toList(),
+                  ),
+                )
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 10, 0),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, i) {
+                        final song = songs[i];
+                        return LibrarySongRow(
+                          song: song,
+                          onTap: () => controller.playSong(song),
+                          onMore: () => showSongOptions(context, song),
+                        );
+                      },
+                      childCount: songs.length,
                     ),
                   ),
-              ],
-            ),
+                ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: AppPlayerShell.scrollListBottomInset),
+              ),
+            ],
           );
         }),
       ),

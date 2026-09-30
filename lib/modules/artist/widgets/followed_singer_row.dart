@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/assets/app_assets.dart';
@@ -6,6 +5,8 @@ import '../../../core/l10n/l10n.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_icon.dart';
 import '../../../data/models/followed_singer.dart';
+import '../singer_shared_element.dart';
+import 'singer_hero_widgets.dart';
 
 class FollowedSingerRow extends StatelessWidget {
   const FollowedSingerRow({
@@ -28,24 +29,19 @@ class FollowedSingerRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
           children: [
-            ClipOval(
-              child: SizedBox(
-                width: _avatarSize,
-                height: _avatarSize,
-                child: singer.avatarUrl.isNotEmpty
-                    ? CachedNetworkImage(imageUrl: singer.avatarUrl, fit: BoxFit.cover)
-                    : Container(color: AppColors.greyLight),
-              ),
+            SingerHeroAvatar(
+              tag: SingerSharedElement.avatarTag(singer.id),
+              avatarUrl: singer.avatarUrl,
+              size: _avatarSize,
             ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    singer.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  SingerHeroName(
+                    tag: SingerSharedElement.nameTag(singer.id),
+                    title: singer.name,
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

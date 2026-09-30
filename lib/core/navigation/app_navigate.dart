@@ -176,10 +176,18 @@ abstract final class AppNavigate {
     );
   }
 
-  static Future<T?>? toSingerDetail<T>({required String singerId}) {
+  static Future<T?>? toSingerDetail<T>({
+    required String singerId,
+    String singerName = '',
+    String singerAvatarUrl = '',
+  }) {
     return Get.toNamed<T>(
       AppRoute.singerDetail,
-      parameters: {AppRouteParam.singerId: singerId},
+      parameters: {
+        AppRouteParam.singerId: singerId,
+        AppRouteParam.singerName: singerName,
+        AppRouteParam.singerAvatarUrl: singerAvatarUrl,
+      },
     );
   }
 

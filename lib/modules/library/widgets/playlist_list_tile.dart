@@ -1,9 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import '../../../core/assets/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_icon.dart';
+import '../../playlist/playlist_shared_element.dart';
+import '../../playlist/widgets/playlist_hero_widgets.dart';
 import '../../../data/models/user_playlist.dart';
 
 class PlaylistListTile extends StatelessWidget {
@@ -26,29 +25,19 @@ class PlaylistListTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
         child: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: SizedBox(
-                width: 56,
-                height: 56,
-                child: playlist.coverUrl.isNotEmpty
-                    ? CachedNetworkImage(
-                        imageUrl: playlist.coverUrl,
-                        fit: BoxFit.cover,
-                        errorWidget: (_, __, ___) => _coverFallback(),
-                      )
-                    : _coverFallback(),
-              ),
+            PlaylistHeroCover(
+              tag: PlaylistSharedElement.coverTag(playlist.id),
+              coverUrl: playlist.coverUrl,
+              size: 56,
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    playlist.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  PlaylistHeroTitle(
+                    tag: PlaylistSharedElement.titleTag(playlist.id),
+                    title: playlist.title,
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
@@ -72,12 +61,4 @@ class PlaylistListTile extends StatelessWidget {
     );
   }
 
-  Widget _coverFallback() {
-    return const ColoredBox(
-      color: AppColors.greyLight,
-      child: Center(
-        child: AppIcon(AppAssets.icPlaylist, size: 28, color: AppColors.txtHint),
-      ),
-    );
-  }
 }

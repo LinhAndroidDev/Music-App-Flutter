@@ -25,6 +25,8 @@ class SingerDetailController extends BaseController {
   final AuthRepository _auth;
 
   late final String singerId;
+  late final String initialName;
+  late final String initialAvatarUrl;
 
   final isLoading = true.obs;
   final loadError = false.obs;
@@ -36,8 +38,23 @@ class SingerDetailController extends BaseController {
   void onInit() {
     super.onInit();
     singerId = Get.parameters[AppRouteParam.singerId] ?? '';
+    initialName = Get.parameters[AppRouteParam.singerName] ?? '';
+    initialAvatarUrl = Get.parameters[AppRouteParam.singerAvatarUrl] ?? '';
     ever(_followed.followedSingers, (_) => _syncFollowed());
     load();
+  }
+
+  String displayName(dynamic l10n) {
+    final n = singer.value?.name;
+    if (n != null && n.isNotEmpty) return n;
+    if (initialName.isNotEmpty) return initialName;
+    return l10n.singer_info_empty;
+  }
+
+  String displayAvatarUrl() {
+    final url = singer.value?.avatarUrl;
+    if (url != null && url.isNotEmpty) return url;
+    return initialAvatarUrl;
   }
 
   void _syncFollowed() {

@@ -38,6 +38,8 @@ abstract final class AppRouteParam {
 
   static const committedQuery = 'committedQuery';
   static const singerId = 'singerId';
+  static const singerName = 'singerName';
+  static const singerAvatarUrl = 'singerAvatarUrl';
 
   static const playlistId = 'playlistId';
   static const playlistTitle = 'playlistTitle';

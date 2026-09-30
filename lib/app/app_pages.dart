@@ -69,11 +69,15 @@ class AppPages {
       name: AppRoute.singerDetail,
       page: () => const SingerDetailPage(),
       binding: SingerDetailBinding(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 320),
     ),
     GetPage(
       name: AppRoute.playlistDetail,
       page: () => const PlaylistDetailPage(),
       binding: PlaylistDetailBinding(),
+      transition: Transition.fadeIn,
+      transitionDuration: const Duration(milliseconds: 320),
     ),
     GetPage(
       name: AppRoute.addPlaylistSongs,

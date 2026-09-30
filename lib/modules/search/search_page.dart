@@ -99,7 +99,11 @@ class SearchPage extends GetView<MusicSearchController> {
                           onRelatedNameTap: controller.applyChipQuery,
                           onSongTap: (s) => _playSong(state.songs, s),
                           onSongMore: (s) => showSongOptions(context, s),
-                          onSingerTap: (s) => AppNavigate.toSingerDetail(singerId: s.id),
+                          onSingerTap: (s) => AppNavigate.toSingerDetail(
+                            singerId: s.id,
+                            singerName: s.name,
+                            singerAvatarUrl: s.avatarUrl,
+                          ),
                         );
                       case SearchChrome.tabs:
                         return SearchCommittedTabs(
@@ -108,7 +112,11 @@ class SearchPage extends GetView<MusicSearchController> {
                           bottomPadding: bottomPadding,
                           onSongTap: (s) => _playSong(state.songs, s),
                           onSongMore: (s) => showSongOptions(context, s),
-                          onSingerTap: (s) => AppNavigate.toSingerDetail(singerId: s.id),
+                          onSingerTap: (s) => AppNavigate.toSingerDetail(
+                            singerId: s.id,
+                            singerName: s.name,
+                            singerAvatarUrl: s.avatarUrl,
+                          ),
                         );
                     }
                   }),

@@ -21,7 +21,11 @@ class FollowedSingersController extends BaseController {
   RxList<FollowedSinger> get singers => _followed.followedSingers;
 
   void openSingerDetail(FollowedSinger singer) {
-    AppNavigate.toSingerDetail(singerId: singer.id);
+    AppNavigate.toSingerDetail(
+      singerId: singer.id,
+      singerName: singer.name,
+      singerAvatarUrl: singer.avatarUrl,
+    );
   }
 
   Future<void> openAddArtist() async {
