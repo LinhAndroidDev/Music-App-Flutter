@@ -7,7 +7,6 @@ abstract final class AppAssets {
   static const icLibraryMusic = '$icons/ic_library_music.svg';
   static const icDiscover = '$icons/ic_discover.svg';
   static const icZingChart = '$icons/ic_zing_chart.svg';
-  static const icRadio = '$icons/ic_radio.svg';
   static const icProfile = '$icons/ic_profile.svg';
   static const icMusic = '$icons/ic_music.svg';
   static const icStar = '$icons/ic_star.svg';

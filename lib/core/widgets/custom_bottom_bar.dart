@@ -28,7 +28,6 @@ class CustomBottomBar extends StatelessWidget {
       _BottomItem(AppTab.library, AppAssets.icLibraryMusic, l10n.nav_library),
       _BottomItem(AppTab.discover, AppAssets.icDiscover, l10n.nav_discover),
       _BottomItem(AppTab.zingChart, AppAssets.icZingChart, l10n.nav_zingchart),
-      _BottomItem(AppTab.radio, AppAssets.icRadio, l10n.nav_radio),
       _BottomItem(AppTab.profile, AppAssets.icProfile, l10n.nav_profile),
     ];
 

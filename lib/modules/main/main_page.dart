@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../core/l10n/l10n.dart';
-import '../../core/navigation/app_route.dart';
 import '../../core/theme/app_colors.dart';
 import '../discover/discover_page.dart';
 import '../library/library_page.dart';
@@ -24,34 +22,8 @@ class MainPage extends GetView<MainController> {
             LibraryPage(),
             DiscoverPage(),
             ZingChartPage(),
-            _TabPlaceholder(tab: AppTab.radio),
             ProfilePage(),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TabPlaceholder extends StatelessWidget {
-  const _TabPlaceholder({required this.tab});
-
-  final int tab;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = context.l10n;
-    final label = switch (tab) {
-      AppTab.discover => l10n.nav_discover,
-      AppTab.zingChart => l10n.nav_zingchart,
-      AppTab.radio => l10n.nav_radio,
-      _ => '',
-    };
-    return SafeArea(
-      child: Center(
-        child: Text(
-          label,
-          style: Theme.of(context).textTheme.headlineSmall,
         ),
       ),
     );

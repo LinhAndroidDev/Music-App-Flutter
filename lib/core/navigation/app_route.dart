@@ -24,8 +24,7 @@ abstract final class AppTab {
   static const library = 0;
   static const discover = 1;
   static const zingChart = 2;
-  static const radio = 3;
-  static const profile = 4;
+  static const profile = 3;
 }
 
 /// Query / path parameter keys for GetX [Get.parameters].

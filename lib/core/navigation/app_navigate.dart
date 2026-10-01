@@ -58,8 +58,6 @@ abstract final class AppNavigate {
 
   static void toZingChartTab() => toMain(tab: AppTab.zingChart);
 
-  static void toRadioTab() => toMain(tab: AppTab.radio);
-
   static void toProfileTab() => toMain(tab: AppTab.profile);
 
   /// Updates the main tab and returns to [AppRoute.main] when a stack screen is open.

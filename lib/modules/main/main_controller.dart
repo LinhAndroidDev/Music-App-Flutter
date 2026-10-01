@@ -52,7 +52,13 @@ class MainController extends BaseController implements MainTabController {
     final tabParam = Get.parameters[AppRouteParam.tab];
     if (tabParam == null) return;
     final parsed = int.tryParse(tabParam);
-    if (parsed != null && parsed >= AppTab.library && parsed <= AppTab.profile) {
+    if (parsed == null) return;
+    // Legacy index before Radio tab removal: profile was 4.
+    if (parsed == 4) {
+      currentTab.value = AppTab.profile;
+      return;
+    }
+    if (parsed >= AppTab.library && parsed <= AppTab.profile) {
       currentTab.value = parsed;
     }
   }
