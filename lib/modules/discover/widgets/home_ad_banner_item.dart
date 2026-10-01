@@ -18,10 +18,9 @@ class HomeAdBannerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final inset = BannerCarouselMetrics.fromWidth(MediaQuery.sizeOf(context).width).sideInset;
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: BannerCarouselMetrics.horizontalScreenInset,
-      ),
+      padding: EdgeInsets.symmetric(horizontal: inset),
       child: SizedBox(
         height: BannerCarouselMetrics.viewportHeight,
         child: HomeAdBannerCard(

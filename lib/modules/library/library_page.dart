@@ -13,6 +13,7 @@ import '../../data/services/favourite_song_repository.dart';
 import '../../data/services/followed_singer_repository.dart';
 import '../../data/services/playlist_repository.dart';
 import '../../data/services/recent_history_repository.dart';
+import '../player/app_player_shell.dart';
 import 'library_controller.dart';
 import 'widgets/library_shortcut_card.dart';
 import 'widgets/playlist_list_tile.dart';
@@ -36,7 +37,9 @@ class LibraryPage extends GetView<LibraryController> {
       child: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(bottom: 24),
+          padding: EdgeInsets.only(
+            bottom: AppPlayerShell.scrollBottomPadding(context),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

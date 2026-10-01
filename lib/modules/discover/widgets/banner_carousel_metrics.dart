@@ -1,25 +1,24 @@
-/// Home banner carousel: screen inset + peek of adjacent pages via [PageView].
+/// Home banner carousel: [PageView] with [viewportFraction] so adjacent banners peek.
 class BannerCarouselMetrics {
   BannerCarouselMetrics._(this.screenWidth);
 
-  /// Distance from screen left/right to the focused banner when snapped.
-  static const horizontalScreenInset = 30.0;
+  /// Focused page width vs screen (see discover banner [PageView]).
+  static const viewportFraction = 0.75;
 
   static const viewportHeight = 330.0;
-  static const verticalMargin = 0.0;
+  static const itemSpacing = 8.0;
 
   final double screenWidth;
 
-  /// Width of the focused banner (screen width minus both insets).
-  late final double bannerWidth =
-      screenWidth - horizontalScreenInset * 2;
+  /// Inset from screen edge when the current page is snapped (each side).
+  late final double sideInset = screenWidth * (1 - viewportFraction) / 2;
 
-  /// With [PageView], adjacent banners peek by one inset on each side.
-  late final double sidePeekWidth = horizontalScreenInset;
+  /// Usable width inside one page slot (minus inner spacing between cards).
+  late final double bannerWidth = screenWidth * viewportFraction - itemSpacing;
 
-  late final double viewportFraction = bannerWidth / screenWidth;
+  late final double sidePeekWidth = sideInset;
 
-  double get cardHeight => viewportHeight - verticalMargin * 2;
+  double get cardHeight => viewportHeight;
 
   factory BannerCarouselMetrics.fromWidth(double screenWidth) {
     return BannerCarouselMetrics._(screenWidth);

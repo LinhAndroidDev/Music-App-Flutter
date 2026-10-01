@@ -11,6 +11,7 @@ import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_decorations.dart';
 import '../../core/widgets/app_icon.dart';
 import '../../core/widgets/screen_header.dart';
+import '../player/app_player_shell.dart';
 import '../../data/models/auth_user.dart';
 import 'models/subscription_plan.dart';
 import 'profile_controller.dart';
@@ -29,7 +30,9 @@ class ProfilePage extends GetView<ProfileController> {
       child: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(bottom: 32),
+          padding: EdgeInsets.only(
+            bottom: AppPlayerShell.scrollBottomPadding(context),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

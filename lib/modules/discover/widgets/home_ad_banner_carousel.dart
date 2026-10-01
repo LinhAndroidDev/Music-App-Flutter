@@ -48,7 +48,7 @@ class _HomeAdBannerCarouselState extends State<HomeAdBannerCarousel> {
   void _ensurePageController(BannerCarouselMetrics metrics) {
     if (widget.ads.isEmpty) return;
     final count = widget.ads.length;
-    final fraction = count > 1 ? metrics.viewportFraction : 1.0;
+    final fraction = count > 1 ? BannerCarouselMetrics.viewportFraction : 1.0;
     if (_pageController != null && _viewportFraction == fraction) {
       return;
     }
@@ -204,9 +204,7 @@ class _HomeAdBannerCarouselState extends State<HomeAdBannerCarousel> {
       return Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: BannerCarouselMetrics.horizontalScreenInset,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: metrics.sideInset),
             child: SizedBox(
               height: BannerCarouselMetrics.viewportHeight,
               width: metrics.bannerWidth,
@@ -248,25 +246,30 @@ class _HomeAdBannerCarouselState extends State<HomeAdBannerCarousel> {
               },
               itemBuilder: (context, index) {
                 final ad = ads[_toRealIndex(index)];
-                return SizedBox(
-                  height: BannerCarouselMetrics.viewportHeight,
-                  child: AnimatedBuilder(
-                    animation: controller,
-                    builder: (context, child) {
-                      final depth = _depthForPage(controller, index);
-                      return Opacity(
-                        opacity: depth.opacity,
-                        child: Transform.scale(
-                          scale: depth.scale,
-                          alignment: Alignment.center,
-                          child: child,
-                        ),
-                      );
-                    },
-                    child: HomeAdBannerCard(
-                      imageUrl: ad.image,
-                      update: ad.update,
-                      detail: ad.detail,
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: BannerCarouselMetrics.itemSpacing / 2,
+                  ),
+                  child: SizedBox(
+                    height: BannerCarouselMetrics.viewportHeight,
+                    child: AnimatedBuilder(
+                      animation: controller,
+                      builder: (context, child) {
+                        final depth = _depthForPage(controller, index);
+                        return Opacity(
+                          opacity: depth.opacity,
+                          child: Transform.scale(
+                            scale: depth.scale,
+                            alignment: Alignment.center,
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: HomeAdBannerCard(
+                        imageUrl: ad.image,
+                        update: ad.update,
+                        detail: ad.detail,
+                      ),
                     ),
                   ),
                 );

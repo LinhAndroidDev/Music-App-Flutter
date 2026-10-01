@@ -28,6 +28,11 @@ class AppPlayerShell extends StatefulWidget {
   /// Extra list padding when shell inset is not applied (legacy screens).
   static const scrollListBottomInset = 156.0;
 
+  /// Use on main-tab scroll views — chrome is merged into [MediaQuery.padding.bottom].
+  static double scrollBottomPadding(BuildContext context, {double extra = 16}) {
+    return MediaQuery.paddingOf(context).bottom + extra;
+  }
+
   static double bottomContentInset(
     BuildContext context, {
     required bool showBottomBar,

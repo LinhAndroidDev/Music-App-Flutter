@@ -15,6 +15,7 @@ import 'widgets/home_national_chip.dart';
 import 'widgets/home_release_song_row.dart';
 import 'widgets/home_section_title.dart';
 import 'widgets/home_topic_tile.dart';
+import '../player/app_player_shell.dart';
 import '../player/show_song_options.dart';
 import 'widgets/home_zing_chart_card.dart';
 
@@ -131,7 +132,11 @@ class DiscoverPage extends GetView<DiscoverController> {
                     ),
                   ),
                 ),
-                const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: AppPlayerShell.scrollBottomPadding(context),
+                  ),
+                ),
               ],
             ),
           );

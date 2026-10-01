@@ -7,6 +7,7 @@ import '../../core/navigation/app_navigate.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_icon.dart';
 import '../discover/widgets/home_chart_song_row.dart';
+import '../player/app_player_shell.dart';
 import '../player/show_song_options.dart';
 import '../search/widgets/voice_search_dialog.dart';
 import 'zing_chart_controller.dart';
@@ -133,10 +134,15 @@ class ZingChartPage extends GetView<ZingChartController> {
                                 onMore: () => showSongOptions(context, songs[i]),
                               ),
                             ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 8),
                         ],
                       );
                     }),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: AppPlayerShell.scrollBottomPadding(context),
                   ),
                 ),
               ],
