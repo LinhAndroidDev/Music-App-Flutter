@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import 'app/app_pages.dart';
 import 'app/initial_binding.dart';
+import 'data/download/downloaded_song_repository_impl.dart';
 import 'core/network/configure_dev_http_overrides.dart';
 import 'core/l10n/l10n.dart';
 import 'core/theme/app_theme.dart';
@@ -18,6 +19,8 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // Open download DB before [InitialBinding] — [PlayableUriResolver] needs the repo.
+  await DownloadedSongRepositoryImpl.install();
   // Before [GetMaterialApp] builds — [navigatorObservers] needs [AppShellModalObserver].
   InitialBinding().dependencies();
   runApp(const MusicApp());

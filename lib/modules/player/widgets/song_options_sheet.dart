@@ -13,7 +13,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_icon.dart';
 import '../../../core/widgets/app_toast.dart';
 import '../../../core/widgets/service_music_dialog.dart';
+import '../../../data/download/download_status.dart';
 import '../../../data/models/song.dart';
+import '../../../data/playback/download_enqueue_result.dart';
+import '../../../data/playback/downloaded_song_repository.dart';
 import '../../../data/services/favourite_song_repository.dart';
 import '../../discover/utils/format_duration.dart';
 import '../../library/widgets/confirm_remove_song_dialog.dart';
@@ -58,8 +61,11 @@ class SongOptionsSheet extends StatefulWidget {
 
 class _SongOptionsSheetState extends State<SongOptionsSheet> {
   final _favourites = Get.find<FavouriteSongRepository>();
+  final _downloads = Get.find<DownloadedSongRepository>();
   StreamSubscription<bool>? _favSub;
+  StreamSubscription<DownloadStatus?>? _downloadSub;
   bool _isFavourite = false;
+  DownloadStatus? _downloadStatus;
 
   Song get song => widget.song;
 
@@ -69,11 +75,15 @@ class _SongOptionsSheetState extends State<SongOptionsSheet> {
     _favSub = _favourites.watchIsFavourite(song.id).listen((v) {
       if (mounted) setState(() => _isFavourite = v);
     });
+    _downloadSub = _downloads.watchStatus(song.id).listen((status) {
+      if (mounted) setState(() => _downloadStatus = status);
+    });
   }
 
   @override
   void dispose() {
     _favSub?.cancel();
+    _downloadSub?.cancel();
     super.dispose();
   }
 
@@ -162,11 +172,10 @@ class _SongOptionsSheetState extends State<SongOptionsSheet> {
                       timerActive ? AppColors.purple1 : AppColors.textBlack,
                   onTap: () => _SleepTimerSheet.show(context),
                 ),
-              _OptionMusicRow(
+              _DownloadOptionRow(
                 marginTop: 10,
-                icon: AppAssets.icDownloadThin,
-                title: l10n.download_action,
-                onTap: () => _stub(context),
+                status: _downloadStatus,
+                onTap: () => _onDownloadTap(context),
               ),
               _OptionMusicRow(
                 icon: _isFavourite ? AppAssets.icFavouriteFill : AppAssets.icFavouriteThin,
@@ -252,6 +261,31 @@ class _SongOptionsSheetState extends State<SongOptionsSheet> {
     await PickPlaylistSheet.show(context, song);
   }
 
+  Future<void> _onDownloadTap(BuildContext context) async {
+    final l10n = context.l10n;
+    final status = _downloadStatus;
+    if (status == DownloadStatus.downloading || status == DownloadStatus.queued) {
+      return;
+    }
+    Navigator.pop(context);
+    if (status == DownloadStatus.completed) {
+      await _downloads.deleteDownload(song.id);
+      if (!context.mounted) return;
+      showAppToast(l10n.toast_removed_download);
+      return;
+    }
+    final result = await _downloads.enqueueDownload(song);
+    if (!context.mounted) return;
+    switch (result) {
+      case DownloadEnqueueResult.started:
+        showAppToast(l10n.download_started);
+      case DownloadEnqueueResult.alreadyDownloaded:
+        showAppToast(l10n.download_already_done);
+      case DownloadEnqueueResult.invalidSong:
+        break;
+    }
+  }
+
   void _stub(BuildContext context) {
     Navigator.pop(context);
     showAppToast('Tính năng sắp có');
@@ -266,6 +300,40 @@ class _SheetDivider extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(height: 0.8, color: AppColors.greyLight),
+    );
+  }
+}
+
+class _DownloadOptionRow extends StatelessWidget {
+  const _DownloadOptionRow({
+    required this.status,
+    required this.onTap,
+    this.marginTop = 0,
+  });
+
+  final DownloadStatus? status;
+  final VoidCallback onTap;
+  final double marginTop;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final busy =
+        status == DownloadStatus.downloading || status == DownloadStatus.queued;
+    final completed = status == DownloadStatus.completed;
+    final title = completed
+        ? l10n.download_remove_action
+        : busy
+            ? l10n.download_status_downloading
+            : l10n.download_action;
+    return Opacity(
+      opacity: busy ? 0.5 : 1,
+      child: _OptionMusicRow(
+        marginTop: marginTop,
+        icon: AppAssets.icDownloadThin,
+        title: title,
+        onTap: busy ? () {} : onTap,
+      ),
     );
   }
 }

@@ -6,6 +6,7 @@ import '../../core/theme/app_colors.dart';
 import '../library/widgets/library_subpage_header.dart';
 import '../library/widgets/library_song_row.dart';
 import '../library/widgets/song_empty_state.dart';
+import '../player/app_player_shell.dart';
 import '../player/show_song_options.dart';
 import 'downloaded_songs_controller.dart';
 
@@ -67,8 +68,8 @@ class DownloadedSongsPage extends GetView<DownloadedSongsController> {
                     ),
                   ),
                 ),
-              const SliverToBoxAdapter(
-                child: const SizedBox(height: 24),
+              SliverToBoxAdapter(
+                child: SizedBox(height: AppPlayerShell.scrollListBottomInset),
               ),
             ],
           );

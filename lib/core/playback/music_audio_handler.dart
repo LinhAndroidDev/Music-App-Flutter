@@ -182,6 +182,16 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
     return playSong(songs[index], queueIndex: index);
   }
 
+  Future<void> _setAudioSource(String uri) async {
+    final lower = uri.toLowerCase();
+    if (lower.startsWith('http://') || lower.startsWith('https://')) {
+      await _player.setUrl(uri);
+      return;
+    }
+    final path = uri.startsWith('file:') ? Uri.parse(uri).toFilePath() : uri;
+    await _player.setFilePath(path);
+  }
+
   Future<void> _startStreaming(
     Song song,
     int startPositionMs, {
@@ -206,11 +216,7 @@ class MusicAudioHandler extends BaseAudioHandler with SeekHandler, QueueHandler 
 
     try {
       await _player.stop();
-      if (uri.startsWith('http')) {
-        await _player.setUrl(uri);
-      } else {
-        await _player.setFilePath(uri);
-      }
+      await _setAudioSource(uri);
       if (generation != _prepareGeneration) return;
       if (startPositionMs > 0) {
         await _player.seek(Duration(milliseconds: startPositionMs));

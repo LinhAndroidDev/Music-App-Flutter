@@ -12,8 +12,6 @@ import '../data/services/recent_history_repository.dart';
 import '../data/services/user_repository.dart';
 import '../core/playback/music_playback_registry.dart';
 import '../core/playback/playback_controller.dart';
-import '../data/playback/downloaded_song_repository.dart';
-import '../data/playback/downloaded_song_repository_stub.dart';
 import '../data/playback/playback_preferences.dart';
 import '../data/playback/playable_uri_resolver.dart';
 import '../data/lyrics/song_lyrics_loader.dart';
@@ -38,10 +36,7 @@ class InitialBinding extends Bindings {
     Get.put<PlaylistRepository>(PlaylistRepository(), permanent: true);
     Get.put<RecentHistoryRepository>(RecentHistoryRepository(), permanent: true);
     Get.put<SearchHistoryRepository>(SearchHistoryRepository(), permanent: true);
-    Get.put<DownloadedSongRepository>(
-      DownloadedSongRepositoryStub(),
-      permanent: true,
-    );
+    // [DownloadedSongRepositoryImpl.install] in main.dart (async DB open).
     Get.put<PlaybackPreferences>(PlaybackPreferences(), permanent: true);
     Get.put<SongPlaybackRepository>(SongPlaybackRepository(), permanent: true);
     Get.put<PlayableUriResolver>(PlayableUriResolver(), permanent: true);
