@@ -62,6 +62,20 @@ class DownloadFileStore {
     return ext.length > 5 ? 'mp3' : ext;
   }
 
+  /// Finds `{songId}.{ext}` under audio dir (excludes `.part` temp files).
+  Future<File?> findExistingAudioFile(String songId) async {
+    if (songId.isEmpty) return null;
+    final dir = await audioDir();
+    await for (final entity in dir.list()) {
+      if (entity is! File) continue;
+      final name = p.basename(entity.path);
+      if (name.startsWith('$songId.') && !name.endsWith('.part')) {
+        return entity;
+      }
+    }
+    return null;
+  }
+
   Future<void> deleteFilesForSong(String songId) async {
     for (final dir in [await audioDir(), await lyricsDir()]) {
       await for (final entity in dir.list()) {

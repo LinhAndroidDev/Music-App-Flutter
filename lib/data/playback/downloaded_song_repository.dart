@@ -22,4 +22,7 @@ abstract class DownloadedSongRepository extends GetxService {
   Stream<DownloadStatus?> watchStatus(String songId);
 
   Future<DownloadStatus?> getStatus(String songId);
+
+  /// Reload [completedSongs] / [completedCount] from SQLite (e.g. after app start).
+  Future<void> refreshCompleted();
 }

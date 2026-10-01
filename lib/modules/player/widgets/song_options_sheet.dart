@@ -582,8 +582,8 @@ class _SleepTimerOptionRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: isSelected
               ? _CancelRemainingLabel(
-                  full: l10n.sleep_timer_cancel_remaining(remaining: remaining),
-                  highlight: l10n.sleep_timer_remaining_text(remaining: remaining),
+                  full: l10n.sleep_timer_cancel_remaining(remaining),
+                  highlight: l10n.sleep_timer_remaining_text(remaining),
                 )
               : Text(
                   defaultLabel,

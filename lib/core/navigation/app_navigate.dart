@@ -56,7 +56,8 @@ abstract final class AppNavigate {
 
   static void toDiscoverTab() => toMain(tab: AppTab.discover);
 
-  static void toZingChartTab() => toMain(tab: AppTab.zingChart);
+  /// Selects #zingchart tab (ServiceMusic [HomeFragment] → [ZingChartFragment]).
+  static void toZingChartTab() => switchMainTab(AppTab.zingChart);
 
   static void toProfileTab() => toMain(tab: AppTab.profile);
 

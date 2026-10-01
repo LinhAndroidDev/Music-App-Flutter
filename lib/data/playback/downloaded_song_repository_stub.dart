@@ -35,4 +35,7 @@ class DownloadedSongRepositoryStub extends DownloadedSongRepository {
 
   @override
   Future<DownloadStatus?> getStatus(String songId) async => null;
+
+  @override
+  Future<void> refreshCompleted() async {}
 }

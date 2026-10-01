@@ -17,15 +17,12 @@ class DownloadedSongRepositoryImpl extends DownloadedSongRepository {
   DownloadedSongRepositoryImpl._({
     required DownloadedSongDao dao,
     required DownloadFileStore fileStore,
-    required DownloadDatabase database,
   })  : _dao = dao,
-        _fileStore = fileStore,
-        _database = database;
+        _fileStore = fileStore;
 
   final DownloadedSongDao _dao;
   final DownloadFileStore _fileStore;
   late final SongDownloadScheduler _scheduler;
-  final DownloadDatabase _database;
 
   @override
   final completedSongs = <Song>[].obs;
@@ -44,7 +41,6 @@ class DownloadedSongRepositoryImpl extends DownloadedSongRepository {
     final repo = DownloadedSongRepositoryImpl._(
       dao: dao,
       fileStore: fileStore,
-      database: database,
     );
     repo._scheduler = SongDownloadScheduler(
       repository: repo,
@@ -57,10 +53,17 @@ class DownloadedSongRepositoryImpl extends DownloadedSongRepository {
 
   static Future<void> install() async {
     if (Get.isRegistered<DownloadedSongRepository>()) {
-      await Get.delete<DownloadedSongRepository>(force: true);
+      await Get.find<DownloadedSongRepository>().refreshCompleted();
+      return;
     }
     final repo = await create();
     Get.put<DownloadedSongRepository>(repo, permanent: true);
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    unawaited(refreshCompleted());
   }
 
   @override
@@ -132,10 +135,7 @@ class DownloadedSongRepositoryImpl extends DownloadedSongRepository {
     if (entity == null || entity.status != DownloadStatus.completed) {
       return null;
     }
-    final path = entity.localAudioPath.trim();
-    if (path.isEmpty) return null;
-    if (!await File(path).exists()) return null;
-    // just_audio [setFilePath] expects a filesystem path, not a file:// URI.
+    final path = await _resolveStoredAudioPath(entity);
     return path;
   }
 
@@ -177,17 +177,42 @@ class DownloadedSongRepositoryImpl extends DownloadedSongRepository {
     await refreshCompleted();
   }
 
+  @override
   Future<void> refreshCompleted() async {
     final entities = await _dao.listByStatus(DownloadStatus.completed);
     final songs = <Song>[];
     for (final entity in entities) {
-      final path = entity.localAudioPath.trim();
-      if (path.isNotEmpty && await File(path).exists()) {
+      final path = await _resolveStoredAudioPath(entity);
+      if (path != null) {
         songs.add(entity.toSong());
       }
     }
     completedSongs.assignAll(songs);
     completedCount.value = songs.length;
+  }
+
+  Future<String?> _resolveStoredAudioPath(DownloadedSongEntity entity) async {
+    var path = entity.localAudioPath.trim();
+    if (path.isNotEmpty && await File(path).exists()) {
+      return path;
+    }
+
+    final file = await _fileStore.findExistingAudioFile(entity.songId);
+    if (file == null) return null;
+
+    final repaired = file.path;
+    if (repaired != path) {
+      await _dao.updateDownloadResult(
+        songId: entity.songId,
+        status: DownloadStatus.completed,
+        localAudioPath: repaired,
+        localLyricPath: entity.localLyricPath,
+        downloadedAt: entity.downloadedAt > 0
+            ? entity.downloadedAt
+            : DateTime.now().millisecondsSinceEpoch,
+      );
+    }
+    return repaired;
   }
 
   void _emitStatus(String songId, DownloadStatus? status) {
@@ -203,7 +228,6 @@ class DownloadedSongRepositoryImpl extends DownloadedSongRepository {
       unawaited(controller.close());
     }
     _statusControllers.clear();
-    unawaited(_database.close());
     super.onClose();
   }
 }
