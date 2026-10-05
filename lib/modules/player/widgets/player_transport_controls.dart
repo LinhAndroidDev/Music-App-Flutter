@@ -34,10 +34,23 @@ class _PlayerTransportControlsState extends State<PlayerTransportControls> {
 
   @override
   Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        children: [
+          // Only this part follows position ticks; the boundary keeps its repaints from
+          // invalidating the rest of the sheet (and the rotating cover).
+          RepaintBoundary(child: _buildProgress()),
+          _buildButtons(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProgress() {
     return Obx(() {
       final state = _playback.playbackState.value;
       final durationMs = state.durationMs;
-      final shuffleTint = state.isShuffleEnabled ? AppColors.bgPurple : AppColors.white;
 
       final seekFraction = _isUserSeeking && _seekFractionWhileDragging != null
           ? _seekFractionWhileDragging!
@@ -52,88 +65,96 @@ class _PlayerTransportControlsState extends State<PlayerTransportControls> {
       const timeStyle = TextStyle(color: AppColors.white, fontSize: 12);
       final canSeek = durationMs > 0;
 
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 20),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-              child: PlayerSeekBar(
-                value: seekFraction,
-                enabled: canSeek,
-                onDragStart: canSeek
-                    ? () {
-                        setState(() => _isUserSeeking = true);
-                      }
-                    : null,
-                onChanged: canSeek
-                    ? (v) {
-                        setState(() => _seekFractionWhileDragging = v);
-                      }
-                    : null,
-                onDragEnd: canSeek
-                    ? () async {
-                        final v = _seekFractionWhileDragging ?? seekFraction;
-                        setState(() {
-                          _isUserSeeking = false;
-                          _seekFractionWhileDragging = null;
-                        });
-                        await _playback.seekToMs((v * durationMs).round());
-                      }
-                    : null,
-              ),
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+            child: PlayerSeekBar(
+              value: seekFraction,
+              enabled: canSeek,
+              onDragStart: canSeek
+                  ? () {
+                      setState(() => _isUserSeeking = true);
+                    }
+                  : null,
+              onChanged: canSeek
+                  ? (v) {
+                      setState(() => _seekFractionWhileDragging = v);
+                    }
+                  : null,
+              onDragEnd: canSeek
+                  ? () async {
+                      final v = _seekFractionWhileDragging ?? seekFraction;
+                      setState(() {
+                        _isUserSeeking = false;
+                        _seekFractionWhileDragging = null;
+                      });
+                      await _playback.seekToMs((v * durationMs).round());
+                    }
+                  : null,
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(formatDurationMs(displayPositionMs), style: timeStyle),
-                  Text(formatDurationMs(durationMs), style: timeStyle),
-                ],
-              ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 5, 20, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(formatDurationMs(displayPositionMs), style: timeStyle),
+                Text(formatDurationMs(durationMs), style: timeStyle),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                IconButton(
-                  onPressed: () => _player.toggleShuffle(),
-                  icon: AppIcon(AppAssets.iconRandom, size: 28, color: shuffleTint),
-                ),
-                IconButton(
-                  onPressed: () => _playback.skipPrevious(),
-                  icon: const AppIcon(AppAssets.skipPrevious, size: 36, color: AppColors.white),
-                ),
-                IconButton(
-                  onPressed: () => _playback.playPause(),
-                  icon: AppIcon(
-                    state.isPlaying ? AppAssets.icPauseMusic : AppAssets.icPlayMusic,
-                    size: 72,
-                    color: AppColors.white,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => _playback.skipNext(),
-                  icon: const AppIcon(AppAssets.skipNext, size: 36, color: AppColors.white),
-                ),
-                Obx(
-                  () => IconButton(
-                    onPressed: () => _player.cycleRepeat(),
-                    icon: AppIcon(
-                      _repeatAsset(_player.repeatMode.value),
-                      size: 28,
-                      color: AppColors.white,
-                    ),
-                  ),
-                ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       );
     });
+  }
+
+  Widget _buildButtons() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Obx(
+            () => IconButton(
+              onPressed: () => _player.toggleShuffle(),
+              icon: AppIcon(
+                AppAssets.iconRandom,
+                size: 28,
+                color: _playback.isShuffleEnabled.value ? AppColors.bgPurple : AppColors.white,
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: () => _playback.skipPrevious(),
+            icon: const AppIcon(AppAssets.skipPrevious, size: 36, color: AppColors.white),
+          ),
+          Obx(
+            () => IconButton(
+              onPressed: () => _playback.playPause(),
+              icon: AppIcon(
+                _playback.isPlaying.value ? AppAssets.icPauseMusic : AppAssets.icPlayMusic,
+                size: 72,
+                color: AppColors.white,
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: () => _playback.skipNext(),
+            icon: const AppIcon(AppAssets.skipNext, size: 36, color: AppColors.white),
+          ),
+          Obx(
+            () => IconButton(
+              onPressed: () => _player.cycleRepeat(),
+              icon: AppIcon(
+                _repeatAsset(_player.repeatMode.value),
+                size: 28,
+                color: AppColors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

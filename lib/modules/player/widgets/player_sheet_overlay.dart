@@ -32,6 +32,11 @@ class _PlayerSheetOverlayState extends State<PlayerSheetOverlay>
     final curve = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
     _slide = Tween<Offset>(begin: const Offset(0, 1), end: Offset.zero).animate(curve);
     _scrim = Tween<double>(begin: 0, end: 0.45).animate(curve);
+    // Rebuild once the close animation ends so [build] drops the sheet subtree — don't rely on
+    // the parent happening to rebuild.
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.dismissed && mounted) setState(() {});
+    });
     if (widget.isOpen) {
       _controller.forward();
     }

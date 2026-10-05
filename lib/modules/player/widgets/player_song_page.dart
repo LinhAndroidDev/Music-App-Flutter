@@ -29,9 +29,8 @@ class PlayerSongPage extends StatelessWidget {
         Obx(() {
           final song = player.currentSong.value;
           if (song == null) return const SizedBox.shrink();
+          // No per-song key: keep one controller so rotation continues across tracks.
           return RotatingPlayerCover(
-            key: ValueKey(song.id),
-            songId: song.id,
             thumbnailUrl: song.thumbnailUrl,
             size: thumbSize,
             cacheSizePx: cachePx,

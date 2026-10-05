@@ -7,6 +7,7 @@ import '../../core/l10n/l10n.dart';
 import '../../core/navigation/app_navigate.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/widgets/app_icon.dart';
+import 'music_player_coordinator.dart';
 import 'widgets/player_lyrics_page.dart';
 import 'widgets/player_pager_indicator.dart';
 import 'widgets/player_sheet_background.dart';
@@ -34,14 +35,22 @@ class _MusicPlayerSheetState extends State<MusicPlayerSheet> {
   int _pageIndex = MusicPlayerSheet.pageSong;
   double _dragDy = 0;
 
+  Worker? _openWorker;
+
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: MusicPlayerSheet.pageSong);
+    // A drag-dismiss leaves [_dragDy] at the release offset; if the player is reopened before the
+    // close animation removes this sheet, start again from fully open.
+    _openWorker = ever(Get.find<MusicPlayerCoordinator>().isOpen, (bool open) {
+      if (open) _resetDrag();
+    });
   }
 
   @override
   void dispose() {
+    _openWorker?.dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -205,16 +214,18 @@ class _MusicPlayerSheetState extends State<MusicPlayerSheet> {
                       },
                     ),
                     Expanded(
-                      child: PageView(
-                        controller: _pageController,
-                        onPageChanged: (i) => setState(() => _pageIndex = i),
-                        children: [
-                          const PlayerSingerPage(),
-                          const PlayerSongPage(),
-                          PlayerLyricsPage(
-                            isPageVisible: _pageIndex == MusicPlayerSheet.pageLyrics,
-                          ),
-                        ],
+                      child: RepaintBoundary(
+                        child: PageView(
+                          controller: _pageController,
+                          onPageChanged: (i) => setState(() => _pageIndex = i),
+                          children: [
+                            const PlayerSingerPage(),
+                            const PlayerSongPage(),
+                            PlayerLyricsPage(
+                              isPageVisible: _pageIndex == MusicPlayerSheet.pageLyrics,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const PlayerTransportControls(),

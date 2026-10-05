@@ -28,6 +28,12 @@ class PlaybackController extends GetxController {
   final playbackState = PlaybackState.idle.obs;
   final sleepTimerState = SleepTimerState.idle.obs;
 
+  /// Derived from [playbackState] but only notify when the value changes — use these instead of
+  /// [playbackState] in widgets that don't need position ticks (~every 220ms while playing).
+  final isPlaying = false.obs;
+  final isShuffleEnabled = false.obs;
+  final hasActiveSong = false.obs;
+
   StreamSubscription<PlaybackState>? _stateSub;
   StreamSubscription<void>? _notificationTapSub;
   MusicAudioHandler? _handler;
@@ -40,7 +46,15 @@ class PlaybackController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    ever(playbackState, _syncDerivedState);
     _bindHandlerStreams();
+    _syncDerivedState(playbackState.value);
+  }
+
+  void _syncDerivedState(PlaybackState s) {
+    isPlaying.value = s.isPlaying;
+    isShuffleEnabled.value = s.isShuffleEnabled;
+    hasActiveSong.value = s.hasActivePlayer && s.currentSong != null;
   }
 
   @override

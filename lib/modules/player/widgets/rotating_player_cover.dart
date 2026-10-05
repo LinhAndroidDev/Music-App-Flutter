@@ -1,19 +1,20 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/processed_network_image.dart';
 
 /// Circular cover with continuous rotation (ServiceMusic [CustomAnimator.rotationImage]).
 class RotatingPlayerCover extends StatefulWidget {
   const RotatingPlayerCover({
     super.key,
-    required this.songId,
     required this.thumbnailUrl,
     required this.size,
     required this.cacheSizePx,
   });
 
-  final String songId;
   final String thumbnailUrl;
   final double size;
   final int cacheSizePx;
@@ -36,78 +37,67 @@ class _RotatingPlayerCoverState extends State<RotatingPlayerCover>
   }
 
   @override
-  void didUpdateWidget(RotatingPlayerCover oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.songId != widget.songId) {
-      _controller
-        ..reset()
-        ..repeat();
-    }
-  }
-
-  @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
+  /// Bakes the circular crop into the bitmap once, so each frame only rotates a texture
+  /// (no per-frame clip) — the Flutter equivalent of the hardware layer used on Android.
+  Future<ui.Image> _toCircle(ui.Image src) {
+    final px = widget.cacheSizePx;
+    final side = math.min(src.width, src.height).toDouble();
+    final srcRect = Rect.fromCenter(
+      center: Offset(src.width / 2, src.height / 2),
+      width: side,
+      height: side,
+    );
+    final dstRect = Rect.fromLTWH(0, 0, px.toDouble(), px.toDouble());
+
+    final recorder = ui.PictureRecorder();
+    Canvas(recorder)
+      ..clipPath(Path()..addOval(dstRect))
+      ..drawImageRect(src, srcRect, dstRect, Paint()..filterQuality = FilterQuality.medium);
+    final picture = recorder.endRecording();
+    return picture.toImage(px, px).whenComplete(picture.dispose);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final size = widget.size;
+    final placeholder = SizedBox(
+      width: size,
+      height: size,
+      child: const DecoratedBox(
+        decoration: BoxDecoration(color: AppColors.greyLight, shape: BoxShape.circle),
+      ),
+    );
+
     return Material(
       elevation: 10,
       shadowColor: Colors.black54,
       shape: const CircleBorder(),
       color: Colors.transparent,
       child: SizedBox(
-        width: widget.size,
-        height: widget.size,
+        width: size,
+        height: size,
+        // Isolates the per-frame rotation from the rest of the sheet.
         child: RepaintBoundary(
           child: RotationTransition(
             turns: _controller,
-            child: ClipOval(
-              child: _CoverImage(
-                thumbnailUrl: widget.thumbnailUrl,
-                size: widget.size,
-                cacheSizePx: widget.cacheSizePx,
-              ),
-            ),
+            child: widget.thumbnailUrl.isEmpty
+                ? placeholder
+                : ProcessedNetworkImage(
+                    url: widget.thumbnailUrl,
+                    decodeWidth: widget.cacheSizePx,
+                    process: _toCircle,
+                    placeholder: placeholder,
+                    width: size,
+                    height: size,
+                  ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class _CoverImage extends StatelessWidget {
-  const _CoverImage({
-    required this.thumbnailUrl,
-    required this.size,
-    required this.cacheSizePx,
-  });
-
-  final String thumbnailUrl;
-  final double size;
-  final int cacheSizePx;
-
-  @override
-  Widget build(BuildContext context) {
-    if (thumbnailUrl.isEmpty) {
-      return Container(
-        width: size,
-        height: size,
-        color: AppColors.greyLight,
-      );
-    }
-    return CachedNetworkImage(
-      imageUrl: thumbnailUrl,
-      width: size,
-      height: size,
-      fit: BoxFit.cover,
-      memCacheWidth: cacheSizePx,
-      memCacheHeight: cacheSizePx,
-      filterQuality: FilterQuality.medium,
-      placeholder: (_, __) => Container(color: AppColors.greyLight),
-      errorWidget: (_, __, ___) => Container(color: AppColors.greyLight),
     );
   }
 }

@@ -75,11 +75,9 @@ class _AppPlayerShellState extends State<AppPlayerShell> {
       _navRoute.modalRouteCount.value;
       final showBottomBar = _navRoute.showsAppChrome;
 
-      final playbackState = _playback.playbackState.value;
-      final showMiniBar = showBottomBar &&
-          !fullPlayerOpen &&
-          playbackState.hasActivePlayer &&
-          playbackState.currentSong != null;
+      // Not [PlaybackController.playbackState]: that ticks with playback position and would
+      // rebuild the whole shell while music plays.
+      final showMiniBar = showBottomBar && !fullPlayerOpen && _playback.hasActiveSong.value;
 
       final chromeBottom = AppPlayerShell.bottomContentInset(
         context,
