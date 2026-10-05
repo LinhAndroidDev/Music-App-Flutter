@@ -9,6 +9,7 @@ import '../../../core/playback/playback_controller.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_icon.dart';
 import '../../../core/widgets/chrome_top_shadow.dart';
+import '../../../core/widgets/marquee_text.dart';
 import '../../../data/models/song.dart';
 import '../music_player_coordinator.dart';
 import '../player_controller.dart';
@@ -66,10 +67,8 @@ class _MiniPlayerBarState extends State<MiniPlayerBar> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          MarqueeText(
             song.title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: AppColors.textBlack,
               fontSize: 13,
